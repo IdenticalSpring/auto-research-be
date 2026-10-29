@@ -102,7 +102,7 @@ export class ReferenceService {
 
     const pendingPromise = this.correlationService.registerPending<
       Record<string, unknown>
-    >(correlationKey, 120000, 'search_papers', job.id);
+    >(correlationKey, undefined, 'search_papers', job.id);
 
     const topic =
       this.configService.get<string>('kafka.topics.document_setup.request') ||
@@ -194,7 +194,7 @@ export class ReferenceService {
     });
     const pending = this.correlationService.registerPending<Record<string, unknown>>(
       correlationKey,
-      60000,
+      undefined,
       'get_journals',
     );
     await this.kafkaProducer.publish(topic, {

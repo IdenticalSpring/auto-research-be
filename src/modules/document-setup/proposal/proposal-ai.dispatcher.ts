@@ -64,7 +64,7 @@ export class ProposalAiDispatcher {
     });
     const pendingPromise = this.correlation.registerPending<
       Record<string, unknown>
-    >(corrKey, 120000, opt.eventType, job.id);
+    >(corrKey, undefined, opt.eventType, job.id);
     const topic =
       this.configService.get<string>('kafka.topics.document_setup.request') ||
       'document_setup_request_local';

@@ -11,18 +11,39 @@ export const EVENT_TIMEOUT_CONFIG: Record<string, number> = {
   chuyen_de_3: 1500_000,
   writer: 1500_000,
 
+  // 900s (15 minutes) - Journal scraper
+  get_journals: 900_000,
+
   // 300s (5 minutes) - Heavy analysis & presentation
   analyzer: 300_000,
   admin_documents: 300_000,
   user_guide_documents: 300_000,
-  get_journals: 300_000,
   analyzer_tool: 300_000,
   gen_slides: 300_000,
   comment_data: 300_000,
   check_logic_data: 300_000,
   propose_method: 300_000,
 
-  // 120s (2 minutes) - Chatbots & Text enhancement (and default)
+  // 180s (3 minutes) - Proposal, Outline & Reference generation
+  generate_titles: 180_000,
+  generate_title_description: 180_000,
+  generate_title_description_no_info: 180_000,
+  mix_titles: 180_000,
+  generate_outline: 180_000,
+  generate_outline_with_refs: 180_000,
+  modify_outline: 180_000,
+  search_papers: 180_000,
+  user_documents: 180_000,
+  embed_user_documents: 180_000,
+
+  // 120s (2 minutes) - Chatbots & Text enhancement & Ideation (and default)
+  generate_domains: 120_000,
+  generate_subdomains: 120_000,
+  generate_keywords: 120_000,
+  get_research_type: 120_000,
+  search_user_documents: 120_000,
+  delete_documents: 120_000,
+  delete_report: 120_000,
   outer_chatbot: 120_000,
   inner_chatbot: 120_000,
   writer_chatbot: 120_000,

@@ -48,11 +48,25 @@ describe('TimeoutManagerService', () => {
       expect(service.getTimeoutForEvent('writer')).toBe(1500_000);
     });
 
+    it('should return 900s (900000ms) for journal scraping', () => {
+      expect(service.getTimeoutForEvent('get_journals')).toBe(900_000);
+    });
+
     it('should return 300s (300000ms) for analysis & slide events', () => {
       expect(service.getTimeoutForEvent('analyzer')).toBe(300_000);
       expect(service.getTimeoutForEvent('gen_slides')).toBe(300_000);
       expect(service.getTimeoutForEvent('comment_data')).toBe(300_000);
       expect(service.getTimeoutForEvent('propose_method')).toBe(300_000);
+      expect(service.getTimeoutForEvent('admin_documents')).toBe(300_000);
+    });
+
+    it('should return 180s (180000ms) for proposal, outline and papers events', () => {
+      expect(service.getTimeoutForEvent('generate_titles')).toBe(180_000);
+      expect(service.getTimeoutForEvent('generate_title_description')).toBe(180_000);
+      expect(service.getTimeoutForEvent('mix_titles')).toBe(180_000);
+      expect(service.getTimeoutForEvent('generate_outline')).toBe(180_000);
+      expect(service.getTimeoutForEvent('search_papers')).toBe(180_000);
+      expect(service.getTimeoutForEvent('embed_user_documents')).toBe(180_000);
     });
 
     it('should return 120s (120000ms) for chatbot & text enhancement events', () => {
@@ -60,6 +74,8 @@ describe('TimeoutManagerService', () => {
       expect(service.getTimeoutForEvent('inner_chatbot')).toBe(120_000);
       expect(service.getTimeoutForEvent('writer_chatbot')).toBe(120_000);
       expect(service.getTimeoutForEvent('enhance')).toBe(120_000);
+      expect(service.getTimeoutForEvent('generate_domains')).toBe(120_000);
+      expect(service.getTimeoutForEvent('delete_report')).toBe(120_000);
     });
 
     it('should fallback to default 120s for unknown or undefined events', () => {

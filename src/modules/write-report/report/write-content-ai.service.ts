@@ -79,7 +79,7 @@ export class WriteContentAiService {
     const streamObservable = this.correlation.getStreamObservable<Record<string, unknown>>(corrKey);
     const pendingPromise = this.correlation.registerPending<Record<string, unknown>>(
       corrKey,
-      1500000,
+      undefined,
       eventType,
       job.id,
     );
