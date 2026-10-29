@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JobStatus, ModuleType, Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
@@ -9,8 +14,6 @@ import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
 import { AnalyzeRequestDto } from './dto/data-analysis.dto';
 
 type AnalyzeEvent = 'analyzer' | 'analyzer_tool';
-
-const TIMEOUT_MS = 300_000;
 const PUBLISH_ERROR_CODE = 610;
 
 export interface AnalyzeResponse {
@@ -19,13 +22,14 @@ export interface AnalyzeResponse {
   ai_message?: string;
   /** URL báo cáo HTML trên MinIO (rỗng nếu upload lỗi). */
   result_html?: string;
-  /** Hiện là literal "Done" ở phía AI (bug B3) — không dùng để hiển thị. */
   analyze_log?: string;
   detailed_logs?: unknown;
   generated_files?: unknown;
-  /** Hiện luôn [] ở phía AI (bug B2). */
   current_variables?: unknown;
   upload_failed?: boolean;
+  analysis_results?: Record<string, unknown>;
+  charts?: Array<Record<string, unknown>>;
+  summary?: string;
   input_tokens?: number;
   output_tokens?: number;
   embed_tokens?: number;
@@ -48,7 +52,7 @@ export class AnalyzeAiService {
     return this.run('analyzer', userId, datasetId, dto);
   }
 
-  /** `analyzer_tool` — cùng pipeline, AI chạy nhanh hơn (không chèn bảng/biểu đồ vào báo cáo). */
+  /** `analyzer_tool` — cùng pipeline, AI chạy nhanh hơn. */
   analyzeTool(userId: string, datasetId: string, dto: AnalyzeRequestDto) {
     return this.run('analyzer_tool', userId, datasetId, dto);
   }
@@ -59,6 +63,15 @@ export class AnalyzeAiService {
     datasetId: string,
     dto: AnalyzeRequestDto,
   ) {
+    if (eventType === 'analyzer') {
+      if (!dto.variables?.some((v) => v.role === 'dependent')) {
+        throw new BadRequestException('Hồi quy OLS (analyzer) yêu cầu tối thiểu 1 biến phụ thuộc (role: "dependent")');
+      }
+      if (!dto.variables?.some((v) => v.role === 'independent')) {
+        throw new BadRequestException('Hồi quy OLS (analyzer) yêu cầu tối thiểu 1 biến độc lập (role: "independent")');
+      }
+    }
+
     const dataset = await this.prisma.dataset.findFirst({
       where: { id: datasetId, document: { userId } },
       select: { id: true, documentId: true },
@@ -113,7 +126,7 @@ export class AnalyzeAiService {
 
     const pendingPromise = this.correlationService.registerPending<
       Record<string, unknown>
-    >(correlationKey, TIMEOUT_MS, eventType, job.id);
+    >(correlationKey, undefined, eventType, job.id);
 
     const topic =
       this.configService.get<string>('kafka.topics.write_report.request') ||
@@ -142,10 +155,21 @@ export class AnalyzeAiService {
       throw publishError;
     }
 
-    const response = (await pendingPromise) as AnalyzeResponse;
+    let response: AnalyzeResponse;
+    try {
+      response = (await pendingPromise) as AnalyzeResponse;
+    } catch (aiError: unknown) {
+      const err = aiError as Record<string, unknown>;
+      const code = String(err?.error_code || err?.errorCode || '631');
+      const msg = String(err?.error || err?.message || 'AI Analysis failed');
+      await this.prisma.job.update({
+        where: { id: job.id },
+        data: { status: JobStatus.error, errorCode: code, errorMessage: msg },
+      });
+      throw new BadRequestException({ statusCode: 400, errorCode: code, message: msg });
+    }
 
     if (response.has_finished === false) {
-      // Interrupt: AI cần người dùng chỉnh hướng phân tích ⇒ không phải lỗi.
       await this.prisma.job.update({
         where: { id: job.id },
         data: {
@@ -168,19 +192,31 @@ export class AnalyzeAiService {
       };
     }
 
-    await this.prisma.job.update({
-      where: { id: job.id },
-      data: {
-        status: JobStatus.finished,
-        threadId,
-        result: response as unknown as Prisma.InputJsonValue,
-      },
-    });
+    await Promise.all([
+      this.prisma.job.update({
+        where: { id: job.id },
+        data: {
+          status: JobStatus.finished,
+          threadId,
+          result: response as unknown as Prisma.InputJsonValue,
+        },
+      }),
+      this.prisma.dataset.update({
+        where: { id: datasetId },
+        data: {
+          analysisResults: (response.analysis_results ??
+            response.detailed_logs ??
+            response) as Prisma.InputJsonValue,
+          analyzeLog: response.analyze_log ?? 'Done',
+          detailedLogs: (response.detailed_logs ??
+            null) as Prisma.InputJsonValue,
+          generatedFiles: (response.generated_files ??
+            null) as Prisma.InputJsonValue,
+        },
+      }),
+    ]);
 
-    // `result_html` rỗng ⇒ AI upload báo cáo HTML lên MinIO thất bại (upload_failed=true),
-    // job vẫn finished vì detailed_logs/generated_files còn dùng được.
     const reportHtmlMissing = !response.result_html;
-
     this.logger.log(
       `[${eventType}] xong job ${job.id} cho ${dataset.documentId} (reportHtmlMissing=${reportHtmlMissing})`,
     );
@@ -196,8 +232,16 @@ export class AnalyzeAiService {
       result_html: response.result_html ?? '',
       report_html_missing: reportHtmlMissing,
       upload_failed: response.upload_failed ?? false,
+      analysis_results: response.analysis_results ?? null,
+      charts:
+        response.charts ??
+        (Array.isArray(response.generated_files)
+          ? response.generated_files
+          : []),
+      summary: response.summary ?? response.analyze_log ?? null,
       detailed_logs: response.detailed_logs ?? null,
       generated_files: response.generated_files ?? null,
+      has_finished: response.has_finished ?? true,
       data: response,
     };
   }
