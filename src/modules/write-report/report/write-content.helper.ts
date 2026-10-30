@@ -203,6 +203,14 @@ export class WriteContentHelper {
       });
     }
 
+    if (chunk.chapter_break === true || chunk.__interrupt__ === true) {
+      await prisma.job.update({
+        where: { id: jobId },
+        data: { status: JobStatus.suspended, resumeStep: 'chapter_break', threadId, result: chunk as unknown as Prisma.InputJsonValue },
+      });
+      return { isSuspended: true, reason: 'chapter_break' };
+    }
+
     if (chunk.need_data_analyze === true) {
       await prisma.job.update({
         where: { id: jobId },

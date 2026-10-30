@@ -133,6 +133,27 @@ describe('WriteContentAiService', () => {
       );
     });
 
+    it('should suspend job when chapter_break or __interrupt__ flag is received', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockCorrelation.registerPending.mockReturnValue(new Promise(() => {}));
+
+      await service.startWriteContent(userId, validDto);
+      streamSubject.next({ chapter_break: true, __interrupt__: true, thread_id: 'thread-break-1' });
+      await new Promise((r) => setTimeout(r, 10));
+
+      expect(mockPrisma.job.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'job-wc-1' },
+          data: expect.objectContaining({
+            status: JobStatus.suspended,
+            resumeStep: 'chapter_break',
+            threadId: 'thread-break-1',
+          }),
+        }),
+      );
+      expect(mockStreamingManager.completeStream).toHaveBeenCalledWith('stream-key-wc');
+    });
+
     it('should suspend job when need_propose_method flag is received', async () => {
       mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
       mockCorrelation.registerPending.mockReturnValue(new Promise(() => {}));
@@ -250,6 +271,76 @@ describe('WriteContentAiService', () => {
 
       await expect(
         service.resumeAfterDataAnalysis(userId, documentId, { analyzeLog: 'x' }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(mockPrisma.job.update).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ errorCode: '610' }),
+        }),
+      );
+    });
+  });
+
+  describe('resumeChapter', () => {
+    it('should resume suspended job with resumeCharacter: true and keep/forward threadId', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockPrisma.job.findFirst.mockResolvedValue({
+        id: 'job-suspended-ch',
+        threadId: 'thread-break-ch',
+        payload: { event_type: 'chuyen_de_1' },
+      });
+      mockPrisma.job.update.mockResolvedValue({
+        id: 'job-suspended-ch',
+        status: JobStatus.processing,
+      });
+      mockCorrelation.registerPending.mockReturnValue(new Promise(() => {}));
+
+      const result = await service.resumeChapter(userId, documentId, {
+        resumeCharacter: true,
+      });
+
+      expect(mockPrisma.job.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            documentId,
+            status: JobStatus.suspended,
+            resumeStep: 'chapter_break',
+          }),
+        }),
+      );
+      expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
+        'write_section_request_local',
+        expect.objectContaining({
+          resumeCharacter: true,
+          thread_id: 'thread-break-ch',
+          event_type: 'chuyen_de_1',
+        }),
+      );
+      expect(result.status).toBe('resumed');
+      expect(result.threadId).toBe('thread-break-ch');
+    });
+
+    it('should throw NotFoundException when no suspended job at chapter_break exists', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockPrisma.job.findFirst.mockResolvedValue(null);
+
+      await expect(
+        service.resumeChapter(userId, documentId, { resumeCharacter: true }),
+      ).rejects.toBeInstanceOf(NotFoundException);
+      expect(mockKafkaProducer.publish).not.toHaveBeenCalled();
+    });
+
+    it('should map publish failure to job error 610 and BadRequest', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockPrisma.job.findFirst.mockResolvedValue({
+        id: 'job-suspended-ch2',
+        threadId: 'thread-fail',
+        payload: { event_type: 'chuyen_de_1' },
+      });
+      mockPrisma.job.update.mockResolvedValue({ id: 'job-suspended-ch2' });
+      mockKafkaProducer.publish.mockRejectedValue(new Error('kafka write fail'));
+
+      await expect(
+        service.resumeChapter(userId, documentId, { resumeCharacter: true }),
       ).rejects.toBeInstanceOf(BadRequestException);
       expect(mockPrisma.job.update).toHaveBeenLastCalledWith(
         expect.objectContaining({

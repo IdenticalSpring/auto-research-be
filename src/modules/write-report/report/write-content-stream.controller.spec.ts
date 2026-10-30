@@ -32,6 +32,14 @@ describe('WriteContentStreamController', () => {
         streamKey: 'stream-key',
         status: 'started',
       }),
+      resumeChapter: jest.fn<any>().mockResolvedValue({
+        jobId: 'job-wc-1',
+        status: 'resumed',
+      }),
+      resumeAfterDataAnalysis: jest.fn<any>().mockResolvedValue({
+        job_id: 'job-wc-1',
+        status: 'writing_after_analysis',
+      }),
       getWriteStream: jest.fn<any>().mockResolvedValue(of({ data: 'chunk' })),
     };
 
@@ -72,6 +80,36 @@ describe('WriteContentStreamController', () => {
       expect(mockService.startWriteContent).toHaveBeenCalledWith(
         userId,
         expect.objectContaining({ documentId }),
+      );
+    });
+  });
+
+  describe('resumeChapter', () => {
+    it('should delegate to resumeChapter with userId and documentId', async () => {
+      const res = await controller.resumeChapter(userId, documentId, {
+        resumeCharacter: true,
+      });
+
+      expect(res).toEqual({ jobId: 'job-wc-1', status: 'resumed' });
+      expect(mockService.resumeChapter).toHaveBeenCalledWith(
+        userId,
+        documentId,
+        { resumeCharacter: true },
+      );
+    });
+  });
+
+  describe('resumeAfterDataAnalysis', () => {
+    it('should delegate to resumeAfterDataAnalysis', async () => {
+      const res = await controller.resumeAfterDataAnalysis(userId, documentId, {
+        analyzeLog: 'OLS done',
+      });
+
+      expect(res).toEqual({ job_id: 'job-wc-1', status: 'writing_after_analysis' });
+      expect(mockService.resumeAfterDataAnalysis).toHaveBeenCalledWith(
+        userId,
+        documentId,
+        { analyzeLog: 'OLS done' },
       );
     });
   });
