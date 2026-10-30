@@ -132,4 +132,28 @@ describe('TranslateAiService', () => {
       }),
     );
   });
+
+  it('AI trả rejection ⇒ cập nhật job error với code 641 và ném BadRequestException', async () => {
+    correlationMock.registerPending.mockRejectedValueOnce({
+      error_code: 641,
+      error: 'Translation service unavailable',
+    });
+
+    await expect(
+      service.translate('user-1', 'doc-1', {
+        targetLanguage: 'English',
+      } as any),
+    ).rejects.toThrow();
+
+    expect(prismaMock.job.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'job-1' },
+        data: expect.objectContaining({
+          status: 'error',
+          errorCode: '641',
+          errorMessage: 'Translation service unavailable',
+        }),
+      }),
+    );
+  });
 });

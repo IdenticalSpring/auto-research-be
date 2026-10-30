@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JobStatus, ModuleType, Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
@@ -104,9 +109,28 @@ export class TranslateAiService {
       throw publishError;
     }
 
-    const response = await pendingPromise;
+    let response: Record<string, unknown>;
+    try {
+      response = (await pendingPromise) as Record<string, unknown>;
+    } catch (aiError: unknown) {
+      const err = aiError as Record<string, unknown>;
+      const code = String(err?.error_code || err?.errorCode || 641);
+      const msg = String(err?.error || err?.message || 'Translate report failed');
+      await this.prisma.job.update({
+        where: { id: job.id },
+        data: { status: JobStatus.error, errorCode: code, errorMessage: msg },
+      });
+      throw new BadRequestException({
+        statusCode: 400,
+        errorCode: code,
+        message: msg,
+      });
+    }
 
-    const content = await this.readTranslatedContent(mongoDocId, field);
+    let content = await this.readTranslatedContent(mongoDocId, field);
+    if (!content && response.translated_content) {
+      content = response.translated_content;
+    }
 
     await this.prisma.job.update({
       where: { id: job.id },
