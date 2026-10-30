@@ -47,6 +47,7 @@ describe('WriteContentAiService', () => {
         findFirst: jest.fn<any>(),
       },
       report: { upsert: jest.fn<any>().mockResolvedValue({}) },
+      dataset: { findFirst: jest.fn<any>().mockResolvedValue(null) },
     };
 
     mockKafkaProducer = { publish: jest.fn<any>().mockResolvedValue(undefined) };
@@ -227,6 +228,44 @@ describe('WriteContentAiService', () => {
           event_type: 'chuyen_de_2',
           practical_data: practicalData,
           final_proposal: expect.objectContaining({ practical_data: practicalData }),
+        }),
+      );
+    });
+
+    it('should support chuyen_de_3 and auto-resolve OLS results from Dataset', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockPrisma.dataset.findFirst.mockResolvedValue({
+        filePath: 'https://minio/dataset.csv',
+        rawData: [{ y: 10, x: 5 }],
+        analysisResults: { r_squared: 0.92, p_value: 0.001 },
+        analyzeLog: 'OLS regression model completed',
+        detailedLogs: [{ step: 'OLS', coef: 2.1 }],
+        generatedFiles: { plot: 'https://minio/plot.png' },
+        variables: [
+          { variableName: 'GDP', variableRole: 'dependent', variableType: 'observed' },
+          { variableName: 'FDI', variableRole: 'independent', variableType: 'observed' },
+        ],
+      });
+      mockCorrelation.registerPending.mockReturnValue(new Promise(() => {}));
+
+      const res = await service.startWriteContent(userId, {
+        ...validDto,
+        eventType: 'chuyen_de_3',
+      });
+
+      expect(res.status).toBe('started');
+      expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
+        'write_section_request_local',
+        expect.objectContaining({
+          event_type: 'chuyen_de_3',
+          analyze_log: 'OLS regression model completed',
+          data: expect.objectContaining({
+            dataset_url: 'https://minio/dataset.csv',
+          }),
+          variables: expect.arrayContaining([
+            expect.objectContaining({ variable_name: 'GDP', role: 'dependent' }),
+            expect.objectContaining({ variable_name: 'FDI', role: 'independent' }),
+          ]),
         }),
       );
     });

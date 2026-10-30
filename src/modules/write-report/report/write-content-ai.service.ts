@@ -16,6 +16,7 @@ import { WriteContentRequestDto } from './dto/write-content-request.dto';
 import { WriteContentHelper } from './write-content.helper';
 import { WriteContentMongoHelper } from './write-content-mongo.helper';
 import { WriteContentStreamHelper } from './write-content-stream.helper';
+import { WriteContentOlsHelper } from './write-content-ols.helper';
 import {
   ResumeServiceContext,
   WriteContentResumeHelper,
@@ -99,6 +100,23 @@ export class WriteContentAiService {
       job.id,
     );
 
+    let olsData = dto.data;
+    let olsVariables = dto.variables;
+    let analyzeLog = dto.analyzeLog;
+    let detailedLogs = dto.detailedLogs;
+    let generatedFiles = dto.generatedFiles;
+
+    if (eventType === 'chuyen_de_3') {
+      const ols = await WriteContentOlsHelper.resolveOlsData(this.prisma, dto.documentId);
+      if (ols) {
+        olsData = olsData || ols.data;
+        olsVariables = olsVariables || ols.variables;
+        analyzeLog = analyzeLog || ols.analyzeLog;
+        detailedLogs = detailedLogs || ols.detailedLogs;
+        generatedFiles = generatedFiles || ols.generatedFiles;
+      }
+    }
+
     const payload = {
       event_type: eventType,
       model_id: AI_DEFAULT_MODEL,
@@ -121,9 +139,11 @@ export class WriteContentAiService {
       resume_error: dto.resumeError ?? false,
       resume_method: dto.resumeMethod ?? false,
       resumeCharacter: dto.resumeCharacter ?? false,
-      analyze_log: dto.analyzeLog,
-      detailed_logs: dto.detailedLogs,
-      generated_files: dto.generatedFiles,
+      analyze_log: analyzeLog,
+      detailed_logs: detailedLogs,
+      generated_files: generatedFiles,
+      data: olsData,
+      variables: olsVariables,
       practical_data: dto.practicalData ?? (resolved.finalProposal as Record<string, unknown>)?.practical_data,
       job_id: job.id,
     };

@@ -97,4 +97,14 @@ export class WriteContentRequestDto {
   /** Số liệu thực tiễn cho chuyên đề 2 (BE-031) */
   @IsOptional()
   practicalData?: Record<string, unknown> | Array<Record<string, unknown>> | string;
+
+  /** Dataset cho chuyên đề 3 nếu override (BE-032) */
+  @IsOptional()
+  @IsObject()
+  data?: Record<string, unknown>;
+
+  /** Danh sách biến định lượng cho chuyên đề 3 nếu override (BE-032) */
+  @IsOptional()
+  @IsArray()
+  variables?: Array<Record<string, unknown>>;
 }
