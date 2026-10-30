@@ -149,7 +149,32 @@ export class DataAnalysisAiService {
       throw new BadRequestException(getAiErrorMessage(PUBLISH_ERROR_CODE));
     }
 
-    const result = await pendingPromise;
+    let result: Record<string, unknown>;
+    try {
+      result = (await pendingPromise) as Record<string, unknown>;
+    } catch (aiError: unknown) {
+      const err = aiError as Record<string, unknown>;
+      const code = String(err?.error_code || err?.errorCode || errorCode);
+      const msg = String(
+        err?.error ||
+          err?.message ||
+          getAiErrorMessage(Number(code)) ||
+          'AI processing failed',
+      );
+      await this.prisma.job.update({
+        where: { id: job.id },
+        data: {
+          status: JobStatus.error,
+          errorCode: code,
+          errorMessage: msg,
+        },
+      });
+      throw new BadRequestException({
+        statusCode: 400,
+        errorCode: code,
+        message: msg,
+      });
+    }
 
     await this.prisma.job.update({
       where: { id: job.id },
@@ -158,6 +183,15 @@ export class DataAnalysisAiService {
         result: result as Prisma.InputJsonValue,
       },
     });
+
+    if (eventType === 'comment_data' && result) {
+      await this.prisma.dataset.update({
+        where: { id: dataset.id },
+        data: {
+          analyzeLog: (result.comments ?? result) as Prisma.InputJsonValue,
+        },
+      });
+    }
 
     this.logger.log(
       `[${eventType}] Xong job ${job.id} cho document ${dataset.documentId}`,
