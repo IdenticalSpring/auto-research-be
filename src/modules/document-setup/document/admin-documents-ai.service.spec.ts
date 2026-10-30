@@ -164,7 +164,7 @@ describe('AdminDocumentsAiService', () => {
     expect(timeout.getActiveTimeoutCount()).toBe(0);
   });
   it.each(['admin_documents', 'user_guide_documents', 'get_journals'])(
-    'waits configured 300s for %s and returns timeout 604',
+    'waits configured timeout for %s and returns timeout 604',
     async (event) => {
       jest.useFakeTimers();
       try {
@@ -178,11 +178,12 @@ describe('AdminDocumentsAiService', () => {
         const assertion = expect(request).rejects.toMatchObject({
           response: { statusCode: 400, errorCode: 604 },
         });
+        const totalTimeout = event === 'get_journals' ? 900000 : 300000;
         await jest.advanceTimersByTimeAsync(120000);
         expect(correlation.hasPending(keyFor(publish.mock.calls[0][1]))).toBe(
           true,
         );
-        await jest.advanceTimersByTimeAsync(180000);
+        await jest.advanceTimersByTimeAsync(totalTimeout - 120000);
         await assertion;
         expect(jest.getTimerCount()).toBe(0);
       } finally {

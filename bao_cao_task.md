@@ -69,6 +69,8 @@
 | **BE-046** | **[Enhance] `get_suggestions`** | `✅ Done` | **Required:** `document_id: str, section: str, section_context: str, processed_docs: list[dict]` | `suggested_paragraphs: list[dict]` ({original_paragraph, suggested_paragraph, explanation, type}), `disable_edit: bool` | Gọi API nhận mảng `suggested_paragraphs` lưu vào DB `EnhancementSuggestion` |
 | **BE-047** | **[Enhance] `enhance`** | `✅ Done` | **Required:** `document_id: str, section: str, suggested_paragraph: dict` | `updated_paragraphs: str \| list[str]` | User bấm áp dụng 1 suggestion, đoạn văn trong DB được cập nhật nội dung mới |
 | **BE-048** | **[Enhance] `enhance_all`** | `✅ Done` | **Required:** `document_id: str, section: str, suggested_paragraphs: list[dict]` | `updated_paragraphs: str \| list[str]` | User bấm áp dụng tất cả, toàn bộ văn bản được cập nhật một lượt |
+| **BE-049** | **[Pipeline E2E] Kiểm thử 5 bước tích hợp** | `✅ Done` | **Required:** Full flow từ `generate_title_description` ➔ `generate_outline` ➔ `analyzer` ➔ `chuyen_de_1` ➔ `gen_slides` | Test Suite E2E pass 100%, verify luồng nghiệp vụ 5 bước chạy trơn tru | Hoàn thành script verify & Jest E2E test `test/pipeline-5steps.e2e-spec.ts` (5/5 PASS) |
+| **BE-050** | **[Fix Type & Unit Test] Fix Timeout 900s & Lỗi Type** | `✅ Done` | **Required:** Dọn dẹp lỗi type, fix test timeout `admin-documents-ai.service.spec.ts` (900s `get_journals`), đảm bảo `tsc --noEmit` pass | Toàn bộ Unit test & Build pass 100% | Đã fix mock timer 900s, 14/14 unit test PASS trong 0.6s, 0 lỗi biên dịch |
 
 ---
 
