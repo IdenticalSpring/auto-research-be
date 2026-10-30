@@ -185,10 +185,14 @@ export class DataAnalysisAiService {
     });
 
     if (eventType === 'comment_data' && result) {
+      const logValue =
+        typeof result.comments === 'string'
+          ? result.comments
+          : JSON.stringify(result.comments ?? result);
       await this.prisma.dataset.update({
         where: { id: dataset.id },
         data: {
-          analyzeLog: (result.comments ?? result) as Prisma.InputJsonValue,
+          analyzeLog: logValue,
         },
       });
     }

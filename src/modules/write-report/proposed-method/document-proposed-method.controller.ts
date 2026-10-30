@@ -11,10 +11,12 @@ import {
 } from '@nestjs/common';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { ParsedValueDto } from './dto/parsed-value-ai.dto';
 import {
   ProposeMethodResumeDto,
   ProposeMethodStartDto,
 } from './dto/propose-method-ai.dto';
+import { ParsedValueAiService } from './parsed-value-ai.service';
 import { ProposedMethodAiService } from './proposed-method-ai.service';
 import { ProposedMethodService } from './proposed-method.service';
 
@@ -24,6 +26,7 @@ export class DocumentProposedMethodController {
   constructor(
     private readonly service: ProposedMethodService,
     private readonly aiService: ProposedMethodAiService,
+    private readonly parsedValueService: ParsedValueAiService,
   ) {}
 
   @Get(':documentId/proposed-methods')
@@ -54,5 +57,16 @@ export class DocumentProposedMethodController {
     @Body() dto: ProposeMethodResumeDto,
   ) {
     return this.aiService.resume(userId, documentId, dto);
+  }
+
+  /** Event `parsed_value` — chuẩn hóa câu hỏi khảo sát Likert (mã lỗi 639). */
+  @Post(':documentId/parsed-value')
+  @HttpCode(HttpStatus.OK)
+  parseValue(
+    @CurrentUser('sub') userId: string,
+    @Param('documentId', ParseUUIDPipe) documentId: string,
+    @Body() dto: ParsedValueDto,
+  ) {
+    return this.parsedValueService.parseValue(userId, documentId, dto);
   }
 }

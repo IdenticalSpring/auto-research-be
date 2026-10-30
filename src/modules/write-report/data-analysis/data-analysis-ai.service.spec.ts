@@ -87,7 +87,7 @@ describe('DataAnalysisAiService', () => {
     expect(prismaMock.dataset.update).toHaveBeenCalledWith(
       expect.objectContaining({
         where: { id: 'ds-1' },
-        data: { analyzeLog: ['Hợp lệ'] },
+        data: { analyzeLog: JSON.stringify(['Hợp lệ']) },
       }),
     );
     expect(res.job_id).toBe('job-1');
