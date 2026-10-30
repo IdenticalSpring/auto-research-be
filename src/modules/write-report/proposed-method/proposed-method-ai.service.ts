@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JobStatus, ModuleType, Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
@@ -11,6 +16,7 @@ import {
   ProposeMethodStartDto,
 } from './dto/propose-method-ai.dto';
 import { WriteContentMongoHelper } from '../report/write-content-mongo.helper';
+import { ProposedMethodHelper } from './proposed-method.helper';
 
 const EVENT_TYPE = 'propose_method';
 const TIMEOUT_MS = 300_000;
@@ -71,8 +77,17 @@ export class ProposedMethodAiService {
   }
 
   /** Lượt tiếp: người dùng trả lời câu hỏi của AI (giữ nguyên `thread_id`). */
-  resume(userId: string, documentId: string, dto: ProposeMethodResumeDto) {
+  async resume(
+    userId: string,
+    documentId: string,
+    dto: ProposeMethodResumeDto,
+  ) {
     const sessionId = dto.sessionId || `sess-${EVENT_TYPE}-${randomUUID()}`;
+    const finalProposal = await ProposedMethodHelper.resolveProposal(
+      this.prisma,
+      documentId,
+      dto.finalProposal,
+    );
 
     return this.dispatch({
       userId,
@@ -82,7 +97,7 @@ export class ProposedMethodAiService {
       payload: {
         thread_id: dto.threadId,
         user_input: dto.userInput,
-        final_proposal: dto.finalProposal ?? {},
+        final_proposal: finalProposal,
         research_type: dto.researchType ?? { type: 0 },
         resume_method: true,
         resume_error: false,
@@ -163,10 +178,27 @@ export class ProposedMethodAiService {
       throw publishError;
     }
 
-    const response = (await pendingPromise) as ProposeResponse;
+    let response: ProposeResponse;
+    try {
+      response = (await pendingPromise) as ProposeResponse;
+    } catch (aiError: unknown) {
+      const err = aiError as Record<string, unknown>;
+      const code = String(
+        err?.error_code || err?.errorCode || PROPOSE_ERROR_CODE,
+      );
+      const msg = String(err?.error || err?.message || 'Propose method failed');
+      await this.prisma.job.update({
+        where: { id: job.id },
+        data: { status: JobStatus.error, errorCode: code, errorMessage: msg },
+      });
+      throw new BadRequestException({
+        statusCode: 400,
+        errorCode: code,
+        message: msg,
+      });
+    }
 
     if (response.has_finished === false) {
-      // Interrupt: AI hỏi lại ⇒ job treo chờ người dùng (không phải lỗi).
       await this.prisma.job.update({
         where: { id: job.id },
         data: {
@@ -190,7 +222,12 @@ export class ProposedMethodAiService {
     }
 
     const proposal = (response.final_proposal ?? {}) as Record<string, unknown>;
-    await this.saveProposedMethod(documentId, proposal);
+    await ProposedMethodHelper.saveProposedMethod(
+      this.prisma,
+      documentId,
+      proposal,
+      this.logger,
+    );
     await this.prisma.job.update({
       where: { id: job.id },
       data: {
@@ -211,47 +248,5 @@ export class ProposedMethodAiService {
       status: 'finished',
       data: response,
     };
-  }
-
-  /**
-   * Map `final_proposal` của AI → bảng `ProposedMethod` (không cần migration).
-   * `parsed_variables` (AI có thể trả thêm) được giữ trong `Job.result`.
-   */
-  private async saveProposedMethod(
-    documentId: string,
-    proposal: Record<string, unknown>,
-  ) {
-    const data = {
-      researchModel: (proposal.final_model ?? null) as Prisma.InputJsonValue,
-      hypotheses: (proposal.hypothesis ?? null) as Prisma.InputJsonValue,
-      variables: (proposal.variables ?? null) as Prisma.InputJsonValue,
-      surveyQuestions: (proposal.survey_questions ??
-        null) as Prisma.InputJsonValue,
-      questions: (proposal.questions ?? null) as Prisma.InputJsonValue,
-    };
-
-    try {
-      const existing = await this.prisma.proposedMethod.findFirst({
-        where: { documentId },
-        select: { id: true },
-      });
-
-      if (existing) {
-        await this.prisma.proposedMethod.update({
-          where: { id: existing.id },
-          data,
-        });
-        return;
-      }
-
-      await this.prisma.proposedMethod.create({ data: { documentId, ...data } });
-    } catch (error: unknown) {
-      // Không chặn kết quả trả FE nếu lưu DB lỗi — nhưng phải log rõ mã lỗi nghiệp vụ.
-      this.logger.error(
-        `Lưu ProposedMethod thất bại (${PROPOSE_ERROR_CODE}) cho ${documentId}: ${
-          (error as Error).message
-        }`,
-      );
-    }
   }
 }
