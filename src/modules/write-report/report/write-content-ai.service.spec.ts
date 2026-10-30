@@ -208,6 +208,28 @@ describe('WriteContentAiService', () => {
         }),
       );
     });
+
+    it('should support chuyen_de_2 with practicalData and error code 633', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockCorrelation.registerPending.mockReturnValue(new Promise(() => {}));
+
+      const practicalData = { revenue_2023: 500000000, market_share: '15%' };
+      const res = await service.startWriteContent(userId, {
+        ...validDto,
+        eventType: 'chuyen_de_2',
+        practicalData,
+      });
+
+      expect(res.status).toBe('started');
+      expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
+        'write_section_request_local',
+        expect.objectContaining({
+          event_type: 'chuyen_de_2',
+          practical_data: practicalData,
+          final_proposal: expect.objectContaining({ practical_data: practicalData }),
+        }),
+      );
+    });
   });
 
   describe('resumeAfterDataAnalysis', () => {

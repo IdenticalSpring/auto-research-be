@@ -124,6 +124,7 @@ export class WriteContentAiService {
       analyze_log: dto.analyzeLog,
       detailed_logs: dto.detailedLogs,
       generated_files: dto.generatedFiles,
+      practical_data: dto.practicalData ?? (resolved.finalProposal as Record<string, unknown>)?.practical_data,
       job_id: job.id,
     };
 

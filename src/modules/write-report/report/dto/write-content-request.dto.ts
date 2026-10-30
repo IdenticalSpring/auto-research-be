@@ -93,4 +93,8 @@ export class WriteContentRequestDto {
   @IsOptional()
   @IsString()
   language?: string = 'vi';
+
+  /** Số liệu thực tiễn cho chuyên đề 2 (BE-031) */
+  @IsOptional()
+  practicalData?: Record<string, unknown> | Array<Record<string, unknown>> | string;
 }
