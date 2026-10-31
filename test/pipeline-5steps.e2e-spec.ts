@@ -15,6 +15,7 @@ import { ProposalDetailsService } from '../src/modules/document-setup/proposal/p
 import { AnalyzeAiService } from '../src/modules/write-report/data-analysis/analyze-ai.service';
 import { GeneratedSlideAiService } from '../src/modules/write-report/generated-slide/generated-slide-ai.service';
 import { WriteContentAiService } from '../src/modules/write-report/report/write-content-ai.service';
+import { WriteContentMongoHelper } from '../src/modules/write-report/report/write-content-mongo.helper';
 
 describe('E2E Pipeline 5 Steps (BE-049)', () => {
   let app: INestApplication;
@@ -145,6 +146,10 @@ describe('E2E Pipeline 5 Steps (BE-049)', () => {
     analyzeService = moduleFixture.get(AnalyzeAiService);
     writeContentService = moduleFixture.get(WriteContentAiService);
     slideService = moduleFixture.get(GeneratedSlideAiService);
+
+    jest
+      .spyOn(WriteContentMongoHelper, 'ensureMongoReady')
+      .mockImplementation(() => Promise.resolve());
   });
 
   afterAll(async () => {

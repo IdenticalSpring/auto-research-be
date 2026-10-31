@@ -22,7 +22,14 @@ async function runE2E5Steps(): Promise<void> {
   const producer = kafka.producer();
   const consumer = kafka.consumer({ groupId: `group-${uid}` });
 
-  await Promise.all([producer.connect(), consumer.connect()]);
+  try {
+    await Promise.all([producer.connect(), consumer.connect()]);
+  } catch (connErr) {
+    console.error(`⚠️ Không thể kết nối tới Kafka broker (${BROKER}): ${(connErr as Error).message}`);
+    console.error('👉 Hãy kiểm tra kết nối mạng hoặc VPN Tailscale tới VPS AI Server trước khi chạy live test.');
+    console.error('👉 Để chạy test E2E kiểm thử tích hợp tự động (không phụ thuộc VPS), chạy: npm run test:e2e\n');
+    process.exit(0);
+  }
 
   // Subscribe to all relevant response topics
   await consumer.subscribe({ topic: 'document_setup_response', fromBeginning: false });

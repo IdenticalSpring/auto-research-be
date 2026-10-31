@@ -19,6 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config ./test/jest-e2e.json --forceExit",
+    "test:e2e:live": "node --experimental-strip-types scripts/verify-e2e-5steps.ts",
     "test:kafka-smoke": "ts-node --esm scripts/smoke-test-kafka.ts",
     "test:user-guide-smoke": "node scripts/smoke-test-user-guide.ts",
     "prisma:generate": "prisma generate",
