@@ -10,6 +10,7 @@ import { RequestCorrelationService } from '../../../messaging/request-correlatio
 import { StreamingManagerService } from '../../../common/streaming/streaming-manager.service';
 import { WriteContentAiService } from './write-content-ai.service';
 import { WriteContentRequestDto } from './dto/write-content-request.dto';
+import { WriteContentMongoHelper } from './write-content-mongo.helper';
 
 describe('WriteContentAiService', () => {
   let service: WriteContentAiService;
@@ -80,6 +81,14 @@ describe('WriteContentAiService', () => {
     }).compile();
 
     service = module.get<WriteContentAiService>(WriteContentAiService);
+
+    jest
+      .spyOn(WriteContentMongoHelper, 'ensureMongoReady')
+      .mockImplementation(() => Promise.resolve());
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('startWriteContent', () => {
