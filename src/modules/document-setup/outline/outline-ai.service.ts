@@ -25,7 +25,9 @@ export class OutlineAiService {
       dto.headingsPercent,
       dto.outlineCode,
     );
-    const wordCountStr = dto.wordCountStr || `${dto.totalWordCount || 8000} words`;
+    const wordCountStr = dto.wordCountStr
+      ? String(dto.wordCountStr).replace(/\D/g, '') || '8000'
+      : String(dto.totalWordCount || 8000);
     const researchType =
       typeof dto.researchType === 'object' && dto.researchType !== null
         ? dto.researchType

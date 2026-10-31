@@ -68,7 +68,7 @@ describe('OutlineAiService', () => {
           kafkaData: expect.objectContaining({
             field: 'CS',
             domain: 'AI',
-            word_count_str: '5000 words',
+            word_count_str: '5000',
             headings: expect.any(Array),
             headings_percent: expect.any(Array),
             outline_code: expect.any(Array),

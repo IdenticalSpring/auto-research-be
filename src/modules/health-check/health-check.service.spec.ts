@@ -166,4 +166,25 @@ describe('HealthCheckService', () => {
     expect(status?.eventType).toBe('search_papers');
     expect(mockRedisState.getAiStatus).toHaveBeenCalledWith('doc-abc');
   });
+
+  it('should fallback eventType to activeJob action when eventType is omitted', async () => {
+    (mockPrisma.job.findFirst as jest.Mock).mockResolvedValue({
+      id: 'job-789',
+      action: 'generate_titles',
+      status: JobStatus.processing,
+    });
+
+    const dto: HealthCheckWebhookDto = {
+      processStatus: 2,
+    };
+
+    const res = await service.handleHeartbeat('doc-789', dto);
+    expect(res.success).toBe(true);
+    expect(res.data.eventType).toBe('generate_titles');
+    expect(mockRedisState.setAiStatus).toHaveBeenCalledWith(
+      'doc-789',
+      expect.objectContaining({ eventType: 'generate_titles' }),
+      3600,
+    );
+  });
 });

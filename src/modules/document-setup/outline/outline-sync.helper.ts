@@ -26,24 +26,40 @@ export class OutlineSyncHelper {
     outlineCode?: string[],
   ) {
     const defaultHeadings = [
-      { title: 'Chương 1: Mở đầu' },
-      { title: 'Chương 2: Cơ sở lý thuyết' },
-      { title: 'Chương 3: Phương pháp nghiên cứu' },
-      { title: 'Chương 4: Kết quả và thảo luận' },
-      { title: 'Chương 5: Kết luận' },
+      { title: 'Chương 1: Mở đầu', percent: 15 },
+      { title: 'Chương 2: Cơ sở lý thuyết', percent: 25 },
+      { title: 'Chương 3: Phương pháp nghiên cứu', percent: 25 },
+      { title: 'Chương 4: Kết quả và thảo luận', percent: 25 },
+      { title: 'Chương 5: Kết luận', percent: 10 },
     ];
-    const finalHeadings = headings && headings.length > 0 ? headings : defaultHeadings;
+    const rawHeadings = headings && headings.length > 0 ? headings : defaultHeadings;
     let finalPercents = percents;
-    if (!finalPercents || finalPercents.length !== finalHeadings.length) {
-      if (finalHeadings.length === 5) {
+    if (!finalPercents || finalPercents.length !== rawHeadings.length) {
+      if (rawHeadings.length === 5) {
         finalPercents = [15, 25, 25, 25, 10];
       } else {
-        const avg = Math.floor(100 / finalHeadings.length);
-        finalPercents = finalHeadings.map((_, i) =>
-          i === finalHeadings.length - 1 ? 100 - avg * (finalHeadings.length - 1) : avg,
+        const avg = Math.floor(100 / rawHeadings.length);
+        finalPercents = rawHeadings.map((_, i) =>
+          i === rawHeadings.length - 1 ? 100 - avg * (rawHeadings.length - 1) : avg,
         );
       }
     }
+
+    const finalHeadings = rawHeadings.map((h, idx) => {
+      const p = finalPercents[idx];
+      if (typeof h === 'string') {
+        return { title: h, percent: p };
+      }
+      if (h && typeof h === 'object') {
+        return {
+          title: h.title || h.name || `Chương ${idx + 1}`,
+          percent: typeof h.percent === 'number' ? h.percent : p,
+          ...h,
+        };
+      }
+      return { title: `Chương ${idx + 1}`, percent: p };
+    });
+
     const finalCode =
       outlineCode && outlineCode.length === finalHeadings.length
         ? outlineCode
