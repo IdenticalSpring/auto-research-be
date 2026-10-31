@@ -181,7 +181,7 @@ export class ReferenceService {
     }
   }
 
-  async getJournals(lastUpdated?: number) {
+  async getJournals(lastUpdated?: number | string) {
     const sessionId = `sess-journal-${randomUUID()}`;
     const topic =
       this.configService.get<string>('kafka.topics.document_setup.request') ||
@@ -199,7 +199,7 @@ export class ReferenceService {
     );
     await this.kafkaProducer.publish(topic, {
       event_type: 'get_journals',
-      last_updated: lastUpdated || Date.now(),
+      last_updated: String(lastUpdated ?? new Date().getFullYear()),
       session_id: sessionId,
       user_id: 'system',
       document_id: 'system',

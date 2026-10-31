@@ -154,19 +154,32 @@ describe('AnalyzeAiService', () => {
   });
 
   it('analyzer_tool: dùng event_type riêng, cùng shape payload, dùng dynamic timeout', async () => {
-    await service.analyzeTool('user-1', 'ds-1', validOlsBody as any);
+    pendingResponse = {
+      is_tool: true,
+      has_finished: true,
+      tool_results: { correlation_matrix: [[1, 0.5], [0.5, 1]] },
+    };
+
+    const res = await service.analyzeTool('user-1', 'ds-1', {
+      ...validOlsBody,
+      toolConfigs: [{ tool: 'correlation' }],
+    } as any);
 
     const payload = producerMock.publish.mock.calls[0][1] as Record<
       string,
       unknown
     >;
     expect(payload.event_type).toBe('analyzer_tool');
+    expect(payload.tool_configs).toEqual([{ tool: 'correlation' }]);
     expect(correlationMock.registerPending).toHaveBeenCalledWith(
       'key-1',
       undefined,
       'analyzer_tool',
       'job-1',
     );
+    expect(res.is_tool).toBe(true);
+    expect(res.tool_results).toEqual({ correlation_matrix: [[1, 0.5], [0.5, 1]] });
+    expect(res.has_finished).toBe(true);
   });
 
   it('interrupt (has_finished=false) ⇒ job suspended với resumeStep analyzer_feedback', async () => {

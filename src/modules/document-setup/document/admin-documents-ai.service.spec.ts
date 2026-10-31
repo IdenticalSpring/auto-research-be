@@ -108,12 +108,12 @@ describe('AdminDocumentsAiService', () => {
       document_id: 'admin-journals',
       session_id: expect.any(String),
       language: 'vi',
-      last_updated: new Date().getFullYear(),
+      last_updated: String(new Date().getFullYear()),
     });
   });
   it('preserves a supplied journal year', async () => {
     await service.getJournals('user-1', { last_updated: 2020 });
-    expect(publish.mock.calls[0][1].last_updated).toBe(2020);
+    expect(publish.mock.calls[0][1].last_updated).toBe('2020');
   });
   it('correlates concurrent guide requests independently with reversed responses', async () => {
     publish.mockResolvedValue(undefined);

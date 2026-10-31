@@ -175,6 +175,9 @@ export class OutlineAiService {
             });
           }
         }
+        if (dto.documents && dto.documents.length > 0) {
+          await OutlineSyncHelper.applyHeadingRefs(this.prisma, dto.documentId, dto.documents);
+        }
       },
     });
   }

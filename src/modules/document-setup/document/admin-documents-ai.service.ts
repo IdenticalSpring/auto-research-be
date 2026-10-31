@@ -68,7 +68,7 @@ export class AdminDocumentsAiService {
       document_id: 'admin-journals',
       session_id: randomUUID(),
       language: 'vi',
-      last_updated: query.last_updated ?? new Date().getFullYear(),
+      last_updated: String(query.last_updated ?? new Date().getFullYear()),
     };
 
     return this.sendAndCorrelate(payload);
