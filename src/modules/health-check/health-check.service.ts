@@ -21,24 +21,33 @@ export class HealthCheckService {
     message: string;
     data: { id: string; eventType: string; processStatus: number };
   }> {
-    this.logger.log(
-      `Received health-check heartbeat for [${id}]: eventType=${dto.eventType}, processStatus=${dto.processStatus}`,
-    );
-
-    // 1. Cập nhật AI_STATUS:{id} vào Redis với TTL 1 giờ
-    await this.redisState.setAiStatus(id, dto, 3600);
-
-    // 2. Tìm Job liên quan theo documentId hoặc sessionId
+    let activeJob: any = null;
     try {
-      const activeJob = await this.prisma.job.findFirst({
+      activeJob = await this.prisma.job.findFirst({
         where: {
           OR: [{ documentId: id }, { sessionId: id }],
           status: { in: [JobStatus.pending, JobStatus.processing] },
         },
         orderBy: { createdAt: 'desc' },
       });
+    } catch (dbErr: unknown) {
+      this.logger.error(
+        `Failed to find active Job for [${id}]: ${(dbErr as Error).message}`,
+      );
+    }
 
-      if (activeJob) {
+    const eventType = dto.eventType || activeJob?.action || 'unknown';
+
+    this.logger.log(
+      `Received health-check heartbeat for [${id}]: eventType=${eventType}, processStatus=${dto.processStatus}`,
+    );
+
+    // 1. Cập nhật AI_STATUS:{id} vào Redis với TTL 1 giờ
+    await this.redisState.setAiStatus(id, { ...dto, eventType }, 3600);
+
+    // 2. Cập nhật Job status nếu có
+    if (activeJob) {
+      try {
         if (dto.processStatus === 4) {
           // Trạng thái ERROR
           await this.prisma.job.update({
@@ -87,11 +96,11 @@ export class HealthCheckService {
             },
           });
         }
+      } catch (dbErr: unknown) {
+        this.logger.error(
+          `Failed to sync Job status for [${id}]: ${(dbErr as Error).message}`,
+        );
       }
-    } catch (dbErr: unknown) {
-      this.logger.error(
-        `Failed to sync Job status for [${id}]: ${(dbErr as Error).message}`,
-      );
     }
 
     return {
@@ -99,7 +108,7 @@ export class HealthCheckService {
       message: 'Heartbeat and status synchronized successfully',
       data: {
         id,
-        eventType: dto.eventType,
+        eventType,
         processStatus: dto.processStatus,
       },
     };

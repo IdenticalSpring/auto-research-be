@@ -1,4 +1,4 @@
-import { AI_DEFAULT_MODEL } from './kafka.constants';
+import { getAiModelConfig } from './kafka.constants';
 
 export interface KafkaEnvelopeParams {
   eventType: string;
@@ -48,7 +48,8 @@ export function sanitizeKafkaPayload<T>(input: T): T {
 
 /**
  * Khởi tạo Message Request Envelope chuẩn mực 100% gửi vào Kafka Topics.
- * Mặc định tự động điền model_id: AI_DEFAULT_MODEL, language: 'Vietnamese', session_id: 'default'.
+ * Mặc định tự động điền model_id theo cấu hình tập trung (`AI_DEFAULT_MODEL`),
+ * language: 'Vietnamese', session_id: 'default'.
  */
 export function buildKafkaRequestEnvelope(
   params: KafkaEnvelopeParams,
@@ -58,7 +59,7 @@ export function buildKafkaRequestEnvelope(
     event_type: params.eventType,
     user_id: params.userId,
     session_id: params.sessionId || 'default',
-    model_id: params.modelId || AI_DEFAULT_MODEL,
+    model_id: params.modelId || getAiModelConfig().defaultModel,
     language: params.language || 'Vietnamese',
     ...(params.documentId ? { document_id: params.documentId } : {}),
     ...(params.convId ? { conv_id: params.convId } : {}),

@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsBoolean,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -32,9 +33,15 @@ export class SearchPapersDto {
   @IsNotEmpty()
   query!: string;
 
+  /**
+   * AI server quyết định (2026-11-01): `country_filter` là **string enum**
+   * `both | in | out` (AI + OpenAlex filter dùng dạng này). KHÔNG gửi list.
+   */
   @IsOptional()
-  @IsString()
-  countryFilter?: string = 'both';
+  @IsIn(['both', 'in', 'out'], {
+    message: 'country_filter must be one of both|in|out',
+  })
+  countryFilter?: 'both' | 'in' | 'out' = 'both';
 
   @IsOptional()
   @IsBoolean()
@@ -65,9 +72,14 @@ export class SearchPapersDto {
   @Max(2100)
   cutOffYearHigh?: number;
 
+  /**
+   * AI Q2 (2026-11-01): chỉ nhận `""` hoặc `"all"` — cả hai đều = không nối gì
+   * vào query (`search_papers.py:164-166`). Giá trị khác bị nối nguyên văn
+   * ⇒ BE chỉ cho phép 2 giá trị này. Khuyến nghị gửi `""`.
+   */
   @IsOptional()
-  @IsString()
-  searchRange?: string = 'all';
+  @IsIn(['', 'all'], { message: 'search_range must be "" or "all"' })
+  searchRange?: '' | 'all' = '';
 
   @IsOptional()
   @IsBoolean()

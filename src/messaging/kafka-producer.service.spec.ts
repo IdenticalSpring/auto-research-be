@@ -31,16 +31,16 @@ describe('KafkaProducerService', () => {
     mockConfigService = {
       get: jest.fn<any>((key: string) => {
         if (key === 'kafka.brokers') return ['167.254.70.125:9092'];
-        if (key === 'kafka.isLocal') return true;
+        if (key === 'kafka.isLocal') return false;
         if (key === 'kafka.topics') {
           return {
             document_setup: {
-              request: 'document_setup_request_local',
-              response: 'document_setup_response_local',
+              request: 'document_setup_request',
+              response: 'document_setup_response',
             },
             chatbot: {
-              request: 'chatbot_request_local',
-              response: 'chatbot_response_local',
+              request: 'chatbot_request',
+              response: 'chatbot_response',
             },
           };
         }
@@ -95,11 +95,11 @@ describe('KafkaProducerService', () => {
   describe('Validation & Publish', () => {
     it('should publish message successfully when payload is valid with document_id', async () => {
       await expect(
-        service.publish('document_setup_request_local', sampleValidPayload),
+        service.publish('document_setup_request', sampleValidPayload),
       ).resolves.toBeUndefined();
 
       expect(mockKafkaClient.emit).toHaveBeenCalledWith(
-        'document_setup_request_local',
+        'document_setup_request',
         sampleValidPayload,
       );
     });
@@ -115,11 +115,11 @@ describe('KafkaProducerService', () => {
       };
 
       await expect(
-        service.publish('chatbot_request_local', chatbotPayload),
+        service.publish('chatbot_request', chatbotPayload),
       ).resolves.toBeUndefined();
 
       expect(mockKafkaClient.emit).toHaveBeenCalledWith(
-        'chatbot_request_local',
+        'chatbot_request',
         chatbotPayload,
       );
     });
@@ -131,7 +131,7 @@ describe('KafkaProducerService', () => {
       };
 
       await expect(
-        service.publish('chatbot_request_local', innerPayload),
+        service.publish('chatbot_request', innerPayload),
       ).resolves.toBeUndefined();
       expect(mockKafkaClient.emit).toHaveBeenCalledTimes(1);
     });
@@ -155,11 +155,11 @@ describe('KafkaProducerService', () => {
       const invalidPayload = { ...sampleValidPayload, user_id: '' };
 
       await expect(
-        service.publish('document_setup_request_local', invalidPayload),
+        service.publish('document_setup_request', invalidPayload),
       ).rejects.toThrow(BadRequestException);
 
       try {
-        await service.publish('document_setup_request_local', invalidPayload);
+        await service.publish('document_setup_request', invalidPayload);
       } catch (err: unknown) {
         const errorResponse = (
           err as BadRequestException
@@ -181,7 +181,7 @@ describe('KafkaProducerService', () => {
       };
 
       await expect(
-        service.publish('document_setup_request_local', invalidPayload),
+        service.publish('document_setup_request', invalidPayload),
       ).rejects.toThrow(BadRequestException);
       expect(mockKafkaClient.emit).not.toHaveBeenCalled();
     });
@@ -193,7 +193,7 @@ describe('KafkaProducerService', () => {
       };
 
       await expect(
-        service.publish('document_setup_request_local', invalidPayload),
+        service.publish('document_setup_request', invalidPayload),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -204,7 +204,7 @@ describe('KafkaProducerService', () => {
       );
 
       await expect(
-        service.publish('document_setup_request_local', sampleValidPayload),
+        service.publish('document_setup_request', sampleValidPayload),
       ).rejects.toThrow('Kafka broker connection error');
     });
   });

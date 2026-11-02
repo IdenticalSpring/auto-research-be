@@ -33,9 +33,9 @@ describe('SmokeTestController', () => {
       get: jest
         .fn<any>()
         .mockImplementation((key: string, defaultVal?: any) => {
-          if (key === 'kafka.isLocal') return true;
+          if (key === 'kafka.isLocal') return false;
           if (key === 'kafka.topics.document_setup.request') {
-            return 'document_setup_request_local';
+            return 'document_setup_request';
           }
           return defaultVal;
         }),
@@ -88,7 +88,7 @@ describe('SmokeTestController', () => {
       'search_papers',
     );
     expect(mockProducer.publish).toHaveBeenCalledWith(
-      'document_setup_request_local',
+      'document_setup_request',
       expect.objectContaining({
         event_type: 'search_papers',
         query: 'Artificial Intelligence in Education',

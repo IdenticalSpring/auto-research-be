@@ -8,7 +8,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { KafkaProducerService } from './kafka-producer.service';
 import { RequestCorrelationService } from './request-correlation.service';
-import { AI_DEFAULT_MODEL } from '../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../common/kafka/kafka.constants';
 
 @Controller('dev/smoke-test')
 export class SmokeTestController {
@@ -43,7 +43,7 @@ export class SmokeTestController {
 
     const payload = {
       event_type: eventType,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: documentId,
       session_id: sessionId,
@@ -72,7 +72,7 @@ export class SmokeTestController {
 
     const topic =
       this.configService.get<string>('kafka.topics.document_setup.request') ||
-      'document_setup_request_local';
+      'document_setup_request';
 
     const timeoutMs = customTimeout ? Number(customTimeout) : 30000;
 

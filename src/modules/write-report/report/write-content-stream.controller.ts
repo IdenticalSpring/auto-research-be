@@ -11,6 +11,7 @@ import {
 import { Observable } from 'rxjs';
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
+import { ResumeChapterDto } from './dto/resume-chapter.dto';
 import { ResumeDataAnalysisDto } from './dto/resume-data-analysis.dto';
 import { WriteContentRequestDto } from './dto/write-content-request.dto';
 import { WriteContentAiService } from './write-content-ai.service';
@@ -33,6 +34,18 @@ export class WriteContentStreamController {
       throw new BadRequestException('documentId is required');
     }
     return this.writeContentAiService.startWriteContent(userId, dto);
+  }
+
+  /**
+   * BE-030: Multi-turn resume sau khi ngắt chapter_break
+   */
+  @Post([':documentId/resume', ':documentId/resume-chapter'])
+  resumeChapter(
+    @CurrentUser('sub') userId: string,
+    @Param('documentId') documentId: string,
+    @Body() dto: ResumeChapterDto,
+  ) {
+    return this.writeContentAiService.resumeChapter(userId, documentId, dto);
   }
 
   /**

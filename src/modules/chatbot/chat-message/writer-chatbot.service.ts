@@ -8,7 +8,7 @@ import { InterruptResumeService } from '../../../common/services/interrupt-resum
 import { WriterChatbotDto } from './dto/writer-chatbot.dto';
 import { WriterInteractiveHelper } from './writer-interactive.helper';
 import { getAiErrorMessage } from '../../../common/constants/ai-error-codes';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 
 @Injectable()
 export class WriterChatbotService {
@@ -69,7 +69,7 @@ export class WriterChatbotService {
       conv_id: session.id,
       session_id: session.id,
       document_id: session.documentId,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       language: dto.language || session.language || 'vi',
       question: dto.question,
       resume: isResume,
@@ -93,7 +93,7 @@ export class WriterChatbotService {
 
     const topic =
       this.configService.get<string>('kafka.topics.chatbot.request') ||
-      'chatbot_request_local';
+      'chatbot_request';
 
     try {
       await this.kafkaProducer.publish(topic, payload);

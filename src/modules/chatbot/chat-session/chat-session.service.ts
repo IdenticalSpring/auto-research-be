@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../database/prisma.service';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 import { CreateChatSessionDto } from './dto/create-chat-session.dto';
 import { UpdateChatSessionDto } from './dto/update-chat-session.dto';
 
@@ -12,7 +12,7 @@ export class ChatSessionService {
     await this.ensureUser(userId);
     if (dto.documentId) await this.ensureDocument(userId, dto.documentId);
     return this.prisma.chatSession.create({
-      data: { ...dto, model: AI_DEFAULT_MODEL, userId },
+      data: { ...dto, model: getAiModelConfig().defaultModel, userId },
     });
   }
 
@@ -36,7 +36,11 @@ export class ChatSessionService {
   async update(userId: string, id: string, dto: UpdateChatSessionDto) {
     await this.findOne(userId, id);
     if (dto.documentId) await this.ensureDocument(userId, dto.documentId);
-    return this.prisma.chatSession.update({ where: { id, userId }, data: dto });
+    // Luôn ghi model đang cấu hình để session cũ không pin model đã bị thay thế.
+    return this.prisma.chatSession.update({
+      where: { id, userId },
+      data: { ...dto, model: getAiModelConfig().defaultModel },
+    });
   }
 
   async remove(userId: string, id: string) {

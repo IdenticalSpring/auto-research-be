@@ -68,7 +68,7 @@ describe('OutlineAiService', () => {
           kafkaData: expect.objectContaining({
             field: 'CS',
             domain: 'AI',
-            word_count_str: '5000 words',
+            word_count_str: '5000',
             headings: expect.any(Array),
             headings_percent: expect.any(Array),
             outline_code: expect.any(Array),
@@ -104,7 +104,9 @@ describe('OutlineAiService', () => {
           errorCode: 627,
           kafkaData: expect.objectContaining({
             new_headings: [{ title: 'New 1' }, { title: 'New 2' }],
-            new_headings_percent: [40, 60],
+            // AI Q1: percent gửi đi là thang 0..1 (không phải 40/60)
+            new_headings_percent: [0.4, 0.6],
+            headings_percent: [1],
           }),
         }),
       );

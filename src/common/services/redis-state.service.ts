@@ -74,7 +74,7 @@ export class RedisStateService implements OnModuleInit, OnModuleDestroy {
   ): Promise<void> {
     const key = `AI_STATUS:${id}`;
     const payload: AiStatusRecord = {
-      eventType: dto.eventType,
+      eventType: dto.eventType || 'unknown',
       processStatus: dto.processStatus,
       aiError: {
         errorCode: dto.aiError?.errorCode ?? null,

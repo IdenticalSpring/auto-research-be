@@ -9,7 +9,7 @@ import { StreamingManagerService } from '../../../common/streaming/streaming-man
 import { GenerateSlideRequestDto } from './dto/generate-slide-request.dto';
 import { GeneratedSlideHelper } from './generated-slide.helper';
 import { getAiErrorMessage } from '../../../common/constants/ai-error-codes';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 
 @Injectable()
 export class GeneratedSlideAiService {
@@ -96,7 +96,7 @@ export class GeneratedSlideAiService {
       user_preference: numSlides,
       manual_mode: dto.manualMode ?? false,
       slide_style: dto.slideStyle || dto.userPreference?.theme || 'default',
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       language: dto.language || 'vi',
       job_id: job.id,
       slide_id: slideRecord.id,
@@ -104,7 +104,7 @@ export class GeneratedSlideAiService {
 
     const topic =
       this.configService.get<string>('kafka.topics.write_report.request') ||
-      'write_section_request_local';
+      'write_section_request';
 
     try {
       await this.kafkaProducer.publish(topic, payload);

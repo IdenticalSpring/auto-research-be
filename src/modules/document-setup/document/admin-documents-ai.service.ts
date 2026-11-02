@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'node:crypto';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 import {
   getAiErrorMessage,
   getAiErrorName,
@@ -30,12 +30,23 @@ export class AdminDocumentsAiService {
   async uploadSampleDocument(userId: string, dto: AdminSampleDocumentDto) {
     const payload = {
       event_type: 'admin_documents',
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: 'admin-doc',
       session_id: randomUUID(),
       language: dto.language || 'vi',
-      documents: [{ title: dto.title, source: dto.source, ref_id: dto.refId }],
+      // AI Q3 (optional nhưng nên gửi): data_id để AI echo lại và BE ghép job.
+      data_id: dto.refId || 'admin_documents',
+      documents: [
+        {
+          // `url` là bucket/key — AI validate `bucket/key` (§2 fixture).
+          url: dto.source,
+          title: dto.title,
+          // `source` theo AI là vai trò người gửi (ADMIN/USER), KHÔNG phải path.
+          source: 'ADMIN',
+          ref_id: dto.refId,
+        },
+      ],
     };
 
     return this.sendAndCorrelate(payload, 618);
@@ -44,7 +55,7 @@ export class AdminDocumentsAiService {
   async uploadUserGuide(userId: string, dto: AdminUserGuideDto) {
     const payload = {
       event_type: 'user_guide_documents',
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: 'admin-user-guide',
       session_id: randomUUID(),
@@ -63,12 +74,12 @@ export class AdminDocumentsAiService {
   async getJournals(userId: string, query: GetJournalsQueryDto) {
     const payload = {
       event_type: 'get_journals',
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: 'admin-journals',
       session_id: randomUUID(),
       language: 'vi',
-      last_updated: query.last_updated ?? new Date().getFullYear(),
+      last_updated: String(query.last_updated ?? new Date().getFullYear()),
     };
 
     return this.sendAndCorrelate(payload);
@@ -156,7 +167,7 @@ export class AdminDocumentsAiService {
   private getTopic(): string {
     return (
       this.configService.get<string>('kafka.topics.document_setup.request') ||
-      'document_setup_request_local'
+      'document_setup_request'
     );
   }
 }

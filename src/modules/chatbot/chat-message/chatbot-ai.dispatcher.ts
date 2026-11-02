@@ -8,7 +8,7 @@ import {
   getAiErrorMessage,
   getAiErrorName,
 } from '../../../common/constants/ai-error-codes';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 import { SendAiMessageDto } from './dto/send-ai-message.dto';
 
 export interface ChatbotAiDispatchOptions {
@@ -46,7 +46,7 @@ export class ChatbotAiDispatcher {
 
     const payload = {
       event_type: opt.eventType,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: opt.userId,
       conv_id: opt.sessionId,
       session_id: opt.sessionId,
@@ -64,10 +64,10 @@ export class ChatbotAiDispatcher {
     });
     const pendingPromise = this.correlation.registerPending<
       Record<string, unknown>
-    >(corrKey, 120000, opt.eventType, job.id);
+    >(corrKey, undefined, opt.eventType, job.id);
     const topic =
       this.configService.get<string>('kafka.topics.chatbot.request') ||
-      'chatbot_request_local';
+      'chatbot_request';
 
     try {
       await this.kafkaProducer.publish(topic, payload);

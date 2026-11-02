@@ -12,8 +12,10 @@ import {
 import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../../common/guards/jwt-auth.guard';
 import { DeleteReportDto } from './dto/delete-report.dto';
+import { EditReportDto } from './dto/edit-report.dto';
 import { TranslateReportDto } from './dto/translate-report.dto';
 import { DeleteReportAiService } from './delete-report-ai.service';
+import { EditReportAiService } from './edit-report-ai.service';
 import { ReportService } from './report.service';
 import { TranslateAiService } from './translate-ai.service';
 
@@ -24,6 +26,7 @@ export class DocumentReportController {
     private readonly reportService: ReportService,
     private readonly translateAiService: TranslateAiService,
     private readonly deleteReportAiService: DeleteReportAiService,
+    private readonly editReportAiService: EditReportAiService,
   ) {}
 
   @Get(':documentId/report')
@@ -46,6 +49,19 @@ export class DocumentReportController {
     @Body() dto: TranslateReportDto,
   ) {
     return this.translateAiService.translate(userId, documentId, dto);
+  }
+
+  /**
+   * Event `edit_report` — chỉnh sửa đoạn văn theo instruction (mã lỗi 630).
+   */
+  @Post(':documentId/edit-report')
+  @HttpCode(HttpStatus.OK)
+  editReport(
+    @CurrentUser('sub') userId: string,
+    @Param('documentId', ParseUUIDPipe) documentId: string,
+    @Body() dto: EditReportDto,
+  ) {
+    return this.editReportAiService.edit(userId, documentId, dto);
   }
 
   /**

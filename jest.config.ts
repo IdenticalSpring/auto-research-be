@@ -25,6 +25,8 @@ const config: Config = {
     ],
   },
   moduleNameMapper: pathsToModuleNameMapper(paths, { prefix: '<rootDir>/' }),
+  // Coverage: jest coverage fail ở chế độ ESM ⇒ dùng `npm run test:cov` (c8).
+  // Cấu hình ngưỡng nằm trong `.c8rc.json`.
   collectCoverageFrom: [
     'src/**/*.(t|j)s',
     'libs/**/*.(t|j)s',

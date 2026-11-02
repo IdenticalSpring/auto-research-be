@@ -82,6 +82,14 @@ export class AnalyzeVariableDto {
   @IsOptional()
   @IsString()
   collection_method?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  type?: string;
 }
 
 class BaseDataAnalysisDto {

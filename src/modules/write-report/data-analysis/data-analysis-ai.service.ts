@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JobStatus, ModuleType, Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import { getAiErrorMessage } from '../../../common/constants/ai-error-codes';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 import { PrismaService } from '../../../database/prisma.service';
 import { KafkaProducerService } from '../../../messaging/kafka-producer.service';
 import { RequestCorrelationService } from '../../../messaging/request-correlation.service';
@@ -103,7 +103,7 @@ export class DataAnalysisAiService {
     // Identifier luôn gửi kèm để AI echo lại → BE correlate được (Q-06/D1/D5).
     const kafkaPayload: Record<string, unknown> = {
       event_type: eventType,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: dataset.documentId,
       session_id: resolvedSessionId,
@@ -124,7 +124,7 @@ export class DataAnalysisAiService {
 
     const topic =
       this.configService.get<string>('kafka.topics.write_report.request') ||
-      'write_section_request_local';
+      'write_section_request';
 
     try {
       await this.kafkaProducer.publish(topic, kafkaPayload);
@@ -149,7 +149,32 @@ export class DataAnalysisAiService {
       throw new BadRequestException(getAiErrorMessage(PUBLISH_ERROR_CODE));
     }
 
-    const result = await pendingPromise;
+    let result: Record<string, unknown>;
+    try {
+      result = (await pendingPromise) as Record<string, unknown>;
+    } catch (aiError: unknown) {
+      const err = aiError as Record<string, unknown>;
+      const code = String(err?.error_code || err?.errorCode || errorCode);
+      const msg = String(
+        err?.error ||
+          err?.message ||
+          getAiErrorMessage(Number(code)) ||
+          'AI processing failed',
+      );
+      await this.prisma.job.update({
+        where: { id: job.id },
+        data: {
+          status: JobStatus.error,
+          errorCode: code,
+          errorMessage: msg,
+        },
+      });
+      throw new BadRequestException({
+        statusCode: 400,
+        errorCode: code,
+        message: msg,
+      });
+    }
 
     await this.prisma.job.update({
       where: { id: job.id },
@@ -158,6 +183,19 @@ export class DataAnalysisAiService {
         result: result as Prisma.InputJsonValue,
       },
     });
+
+    if (eventType === 'comment_data' && result) {
+      const logValue =
+        typeof result.comments === 'string'
+          ? result.comments
+          : JSON.stringify(result.comments ?? result);
+      await this.prisma.dataset.update({
+        where: { id: dataset.id },
+        data: {
+          analyzeLog: logValue,
+        },
+      });
+    }
 
     this.logger.log(
       `[${eventType}] Xong job ${job.id} cho document ${dataset.documentId}`,

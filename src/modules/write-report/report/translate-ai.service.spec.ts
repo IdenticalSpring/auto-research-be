@@ -30,7 +30,7 @@ describe('TranslateAiService', () => {
       ),
       clearPending: jest.fn(),
     };
-    const configMock = { get: jest.fn(() => 'write_section_request_local') };
+    const configMock = { get: jest.fn(() => 'write_section_request') };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -129,6 +129,30 @@ describe('TranslateAiService', () => {
     expect(prismaMock.job.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ errorCode: '610' }),
+      }),
+    );
+  });
+
+  it('AI trả rejection ⇒ cập nhật job error với code 641 và ném BadRequestException', async () => {
+    correlationMock.registerPending.mockRejectedValueOnce({
+      error_code: 641,
+      error: 'Translation service unavailable',
+    });
+
+    await expect(
+      service.translate('user-1', 'doc-1', {
+        targetLanguage: 'English',
+      } as any),
+    ).rejects.toThrow();
+
+    expect(prismaMock.job.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'job-1' },
+        data: expect.objectContaining({
+          status: 'error',
+          errorCode: '641',
+          errorMessage: 'Translation service unavailable',
+        }),
       }),
     );
   });

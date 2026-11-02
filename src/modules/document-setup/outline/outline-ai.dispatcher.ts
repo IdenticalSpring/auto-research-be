@@ -10,7 +10,7 @@ import {
   getAiErrorName,
 } from '../../../common/constants/ai-error-codes';
 import { OutlineAiDispatchOptions } from './dto/outline-ai.dto';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 
 @Injectable()
 export class OutlineAiDispatcher {
@@ -36,7 +36,7 @@ export class OutlineAiDispatcher {
 
     const payload = {
       event_type: opt.eventType,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: opt.userId,
       document_id: opt.documentId,
       session_id: sessionId,
@@ -53,10 +53,10 @@ export class OutlineAiDispatcher {
     });
     const pendingPromise = this.correlation.registerPending<
       Record<string, unknown>
-    >(corrKey, 120000, opt.eventType, job.id);
+    >(corrKey, undefined, opt.eventType, job.id);
     const topic =
       this.configService.get<string>('kafka.topics.document_setup.request') ||
-      'document_setup_request_local';
+      'document_setup_request';
 
     try {
       await this.kafkaProducer.publish(topic, payload);

@@ -3,6 +3,11 @@ import { PrismaService } from '../../../database/prisma.service';
 import { OutlineAiDispatcher } from './outline-ai.dispatcher';
 import { OutlineSyncHelper } from './outline-sync.helper';
 import {
+  toAiHeadingPercents,
+  toAiOutlinePercents,
+  toAiPercents,
+} from './outline-percent.helper';
+import {
   GenerateOutlineAiDto,
   GenerateOutlineWithRefsDto,
   ModifyOutlineAiDto,
@@ -25,7 +30,9 @@ export class OutlineAiService {
       dto.headingsPercent,
       dto.outlineCode,
     );
-    const wordCountStr = dto.wordCountStr || `${dto.totalWordCount || 8000} words`;
+    const wordCountStr = dto.wordCountStr
+      ? String(dto.wordCountStr).replace(/\D/g, '') || '8000'
+      : String(dto.totalWordCount || 8000);
     const researchType =
       typeof dto.researchType === 'object' && dto.researchType !== null
         ? dto.researchType
@@ -49,8 +56,10 @@ export class OutlineAiService {
               : (doc as any).domain || 'General'),
         research_type: researchType,
         word_count_str: wordCountStr,
-        headings,
-        headings_percent: headingsPercent,
+        // AI Q1: headings_percent là thang 0..1 (tổng = 1) ⇒ convert ở biên payload,
+        // DB/FE vẫn giữ 0..100.
+        headings: toAiHeadingPercents(headings),
+        headings_percent: toAiPercents(headingsPercent),
         final_proposal: finalProposal,
         outline_code: outlineCode,
       },
@@ -95,11 +104,13 @@ export class OutlineAiService {
               : (doc as any).domain || 'General'),
         research_type: dto.researchType || { type: 0, reason: doc.researchType || 'quantitative' },
         final_proposal: finalProposal,
-        headings,
-        headings_percent: headingsPercent,
-        new_headings: newHeadings,
-        new_headings_percent: newHeadingsPercent,
-        outline: currentStructure,
+        // AI Q1: cả 4 danh sách percent đều phải là thang 0..1
+        headings: toAiHeadingPercents(headings),
+        headings_percent: toAiPercents(headingsPercent),
+        new_headings: toAiHeadingPercents(newHeadings),
+        new_headings_percent: toAiPercents(newHeadingsPercent),
+        // `percent` bên trong outline cũng phải là 0..1
+        outline: toAiOutlinePercents(currentStructure),
         instruction: dto.instruction,
       },
       onSuccess: async (data) => {
@@ -132,7 +143,8 @@ export class OutlineAiService {
       errorCode: 626,
       dto,
       kafkaData: {
-        outline: currentOutline,
+        // AI Q1: percent trong từng heading của outline phải là thang 0..1
+        outline: toAiOutlinePercents(currentOutline),
         outline_code: outlineCode,
         final_proposal: finalProposal,
         processed_docs: processedDocs,
@@ -172,6 +184,9 @@ export class OutlineAiService {
               create: { documentId: dto.documentId, referenceId: refId },
             });
           }
+        }
+        if (dto.documents && dto.documents.length > 0) {
+          await OutlineSyncHelper.applyHeadingRefs(this.prisma, dto.documentId, dto.documents);
         }
       },
     });

@@ -52,7 +52,7 @@ describe('ReferenceService', () => {
     mockConfigService = {
       get: jest.fn<any>((key: string) => {
         if (key === 'kafka.topics.document_setup.request') {
-          return 'document_setup_request_local';
+          return 'document_setup_request';
         }
         return undefined;
       }),

@@ -1,4 +1,5 @@
 import { Kafka, logLevel } from 'kafkajs';
+import { resolveScriptModelId } from './lib/ai-model';
 
 async function runSmokeTest(): Promise<void> {
   const brokerString =
@@ -6,9 +7,9 @@ async function runSmokeTest(): Promise<void> {
   const brokers = brokerString.split(',').map((b) => b.trim());
 
   const requestTopic =
-    process.env.REQUEST_TOPIC || 'document_setup_request_local';
+    process.env.REQUEST_TOPIC || 'document_setup_request';
   const responseTopic =
-    process.env.RESPONSE_TOPIC || 'document_setup_response_local';
+    process.env.RESPONSE_TOPIC || 'document_setup_response';
   const timeoutMs = Number(process.env.TIMEOUT_MS) || 90000;
 
   console.log('====================================================');
@@ -26,10 +27,7 @@ async function runSmokeTest(): Promise<void> {
 
   const payload = {
     event_type: 'search_papers',
-    model_id:
-      process.env.AI_DEFAULT_MODEL ||
-      process.env.DEFAULT_AI_MODEL ||
-      'gemini-3.5-flash-lite',
+    model_id: resolveScriptModelId(),
     user_id: userId,
     document_id: documentId,
     session_id: sessionId,
@@ -156,9 +154,14 @@ async function runSmokeTest(): Promise<void> {
     console.log('----------------------------------------------------');
     console.log(`Event Type:    ${response.event_type || 'unknown'}`);
     console.log(`Session ID:    ${response.session_id || response.sessionId}`);
-    console.log(
-      `Papers count:  ${Array.isArray(response.papers) ? response.papers.length : Array.isArray(response.data) ? response.data.length : 'N/A'}`,
-    );
+    if (response.error_code || response.errorCode) {
+      console.log(`⚠️  AI Warning/Error: Code ${response.error_code || response.errorCode}`);
+      console.log(`   Message:          ${response.error || response.errorMessage || 'N/A'}`);
+    } else {
+      console.log(
+        `Papers count:  ${Array.isArray(response.papers) ? response.papers.length : Array.isArray(response.data) ? response.data.length : 'N/A'}`,
+      );
+    }
     console.log(
       `Tokens:        Input=${response.input_tokens ?? 0}, Output=${response.output_tokens ?? 0}`,
     );

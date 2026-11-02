@@ -61,7 +61,7 @@ describe('EnhancementAiService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn<any>().mockReturnValue('enhancement_request_local'),
+            get: jest.fn<any>().mockReturnValue('enhancement_request'),
           },
         },
       ],
@@ -93,7 +93,7 @@ describe('EnhancementAiService', () => {
       expect(res.jobId).toBe('job-enh-1');
       expect(res.response).toBe('Academic rewritten text');
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'enhancement_request_local',
+        'enhancement_request',
         expect.objectContaining({
           event_type: 'ai_in_doc',
           action: 'make_academic',
@@ -101,6 +101,35 @@ describe('EnhancementAiService', () => {
         }),
       );
       expect(mockPrisma.enhancementSession.create).toHaveBeenCalled();
+    });
+
+    it('should join response theo document_id+session_id dù AI KHÔNG echo section_id', async () => {
+      // Quyết định 2026-11-01 §1.3: AI không echo section_id — BE tự join.
+      mockCorrelation.registerPending.mockResolvedValue({
+        event_type: 'ai_in_doc',
+        user_id: userId,
+        document_id: documentId,
+        session_id: 'sess-ai-in-doc',
+        response: 'Bản viết lại',
+      });
+
+      const res = await service.aiInDoc(userId, dto);
+
+      expect(res.response).toBe('Bản viết lại');
+      // Join dựa trên key do buildCorrelationKey(documentId, sessionId) tạo —
+      // response thiếu section_id vẫn về đúng pending request.
+      expect(mockCorrelation.buildCorrelationKey).toHaveBeenCalledWith(
+        expect.objectContaining({
+          documentId,
+          eventType: 'ai_in_doc',
+        }),
+      );
+      expect(mockCorrelation.registerPending).toHaveBeenCalledWith(
+        'corr-enhancement-key',
+        120_000,
+        'ai_in_doc',
+        'job-enh-1',
+      );
     });
 
     it('should handle error when correlation rejects', async () => {

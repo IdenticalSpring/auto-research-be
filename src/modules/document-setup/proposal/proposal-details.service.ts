@@ -60,7 +60,12 @@ export class ProposalDetailsService {
             (dto as GenerateTitleDescriptionDto).level,
           ),
           knowledge_base:
-            (dto as GenerateTitleDescriptionDto).knowledgeBase ?? [],
+            Array.isArray((dto as GenerateTitleDescriptionDto).knowledgeBase) &&
+            ((dto as GenerateTitleDescriptionDto).knowledgeBase ?? []).length > 0
+              ? ((dto as GenerateTitleDescriptionDto).knowledgeBase as any[]).map((k) =>
+                  typeof k === 'object' && k ? k : { title: dto.title, content: String(k) },
+                )
+              : [{ title: dto.title, content: 'Tài liệu tham khảo cơ sở đề tài' }],
         };
 
     return this.dispatcher.dispatch({

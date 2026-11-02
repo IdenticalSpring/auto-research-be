@@ -37,7 +37,7 @@ describe('OutlineAiDispatcher', () => {
     };
 
     mockConfigService = {
-      get: jest.fn<any>().mockReturnValue('document_setup_request_local'),
+      get: jest.fn<any>().mockReturnValue('document_setup_request'),
     };
 
     const module: TestingModule = await Test.createTestingModule({

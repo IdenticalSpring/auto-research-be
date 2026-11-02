@@ -1,0 +1,20 @@
+{
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "**/*.spec.ts",
+    "src/main.ts",
+    "src/**/*.module.ts",
+    "src/**/dto/**",
+    "src/**/*.dto.ts",
+    "src/**/*.fixtures.ts"
+  ],
+  "reporter": ["text-summary", "lcov"],
+  "report-dir": "./coverage",
+  "temp-directory": "./coverage/tmp",
+  "all": false,
+  "check-coverage": true,
+  "lines": 90,
+  "statements": 90,
+  "functions": 90,
+  "branches": 70
+}

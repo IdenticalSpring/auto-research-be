@@ -14,7 +14,6 @@ export class KafkaConsumerController {
     @Optional() private readonly tokenUsageService?: TokenUsageService,
   ) {}
 
-  @EventPattern('document_setup_response_local')
   @EventPattern('document_setup_response')
   async handleDocumentSetupResponse(
     @Payload() rawData: unknown,
@@ -22,19 +21,16 @@ export class KafkaConsumerController {
     await this.processMessage('document_setup', rawData);
   }
 
-  @EventPattern('write_section_response_local')
   @EventPattern('write_section_response')
   async handleWriteSectionResponse(@Payload() rawData: unknown): Promise<void> {
     await this.processMessage('write_report', rawData);
   }
 
-  @EventPattern('chatbot_response_local')
   @EventPattern('chatbot_response')
   async handleChatbotResponse(@Payload() rawData: unknown): Promise<void> {
     await this.processMessage('chatbot', rawData);
   }
 
-  @EventPattern('enhancement_response_local')
   @EventPattern('enhancement_response')
   async handleEnhancementResponse(@Payload() rawData: unknown): Promise<void> {
     await this.processMessage('enhancement', rawData);

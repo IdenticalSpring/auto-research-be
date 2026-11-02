@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { ClientKafka } from '@nestjs/microservices';
 import { Job } from '@prisma/client';
 import { KAFKA_CLIENT } from '../../../common/messaging.tokens';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 import { normalizeAiLanguage } from '../../../common/helpers/academic-level.helper';
 
 @Injectable()
@@ -57,7 +57,7 @@ export class JobsKafkaProducer implements OnModuleInit {
         job.sessionId || rawPayload.session_id || `sess-job-${job.id}`,
       user_id: rawPayload.user_id || '00000000-0000-0000-0000-000000000001',
       resume_step: job.resumeStep || undefined,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       localllm_base_url: isLocal ? localLlmBaseUrl : undefined,
       domains_num: rawPayload.domains_num || rawPayload.domainsNum || 3,
       subdomains_num:

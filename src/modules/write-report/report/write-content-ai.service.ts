@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   Logger,
   NotFoundException,
@@ -12,11 +11,18 @@ import { KafkaProducerService } from '../../../messaging/kafka-producer.service'
 import { RequestCorrelationService } from '../../../messaging/request-correlation.service';
 import { StreamingManagerService } from '../../../common/streaming/streaming-manager.service';
 import { ResumeDataAnalysisDto } from './dto/resume-data-analysis.dto';
+import { ResumeChapterDto } from './dto/resume-chapter.dto';
 import { WriteContentRequestDto } from './dto/write-content-request.dto';
 import { WriteContentHelper } from './write-content.helper';
 import { WriteContentMongoHelper } from './write-content-mongo.helper';
+import { WriteContentStreamHelper } from './write-content-stream.helper';
+import { WriteContentOlsHelper } from './write-content-ols.helper';
+import {
+  ResumeServiceContext,
+  WriteContentResumeHelper,
+} from './write-content-resume.helper';
 import { getAiErrorMessage } from '../../../common/constants/ai-error-codes';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 
 @Injectable()
 export class WriteContentAiService {
@@ -30,10 +36,20 @@ export class WriteContentAiService {
     private readonly configService: ConfigService,
   ) {}
 
+  private get resumeContext(): ResumeServiceContext {
+    return {
+      prisma: this.prisma,
+      kafkaProducer: this.kafkaProducer,
+      correlation: this.correlation,
+      streamingManager: this.streamingManager,
+      configService: this.configService,
+      logger: this.logger,
+    };
+  }
+
   async startWriteContent(userId: string, dto: WriteContentRequestDto) {
     const doc = await this.ensureOwnedDocument(userId, dto.documentId);
     const eventType = dto.eventType || 'write_content';
-    // Map mã lỗi thật theo từng event (bỏ workaround 631 dùng chung cho chuyen_de_3 — B-3/B4).
     const errorCode =
       eventType === 'chuyen_de_1'
         ? 632
@@ -79,14 +95,31 @@ export class WriteContentAiService {
     const streamObservable = this.correlation.getStreamObservable<Record<string, unknown>>(corrKey);
     const pendingPromise = this.correlation.registerPending<Record<string, unknown>>(
       corrKey,
-      1500000,
+      undefined,
       eventType,
       job.id,
     );
 
+    let olsData = dto.data;
+    let olsVariables = dto.variables;
+    let analyzeLog = dto.analyzeLog;
+    let detailedLogs = dto.detailedLogs;
+    let generatedFiles = dto.generatedFiles;
+
+    if (eventType === 'chuyen_de_3') {
+      const ols = await WriteContentOlsHelper.resolveOlsData(this.prisma, dto.documentId);
+      if (ols) {
+        olsData = olsData || ols.data;
+        olsVariables = olsVariables || ols.variables;
+        analyzeLog = analyzeLog || ols.analyzeLog;
+        detailedLogs = detailedLogs || ols.detailedLogs;
+        generatedFiles = generatedFiles || ols.generatedFiles;
+      }
+    }
+
     const payload = {
       event_type: eventType,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: mongoDocId,
       session_id: sessionId,
@@ -98,6 +131,7 @@ export class WriteContentAiService {
       papers_search: resolved.papersSearch,
       outline: resolved.outline,
       outline_code: resolved.outlineCode,
+      heading: dto.heading || (resolved.outlineCode && resolved.outlineCode[0]) || 'chapter_1',
       thread_id: threadId,
       db: 'redis',
       retry: 2,
@@ -106,15 +140,18 @@ export class WriteContentAiService {
       resume_error: dto.resumeError ?? false,
       resume_method: dto.resumeMethod ?? false,
       resumeCharacter: dto.resumeCharacter ?? false,
-      analyze_log: dto.analyzeLog,
-      detailed_logs: dto.detailedLogs,
-      generated_files: dto.generatedFiles,
+      analyze_log: analyzeLog,
+      detailed_logs: detailedLogs,
+      generated_files: generatedFiles,
+      data: olsData,
+      variables: olsVariables,
+      practical_data: dto.practicalData ?? (resolved.finalProposal as Record<string, unknown>)?.practical_data,
       job_id: job.id,
     };
 
     const topic =
       this.configService.get<string>('kafka.topics.write_report.request') ||
-      'write_section_request_local';
+      'write_section_request';
 
     try {
       await this.kafkaProducer.publish(topic, payload);
@@ -127,75 +164,31 @@ export class WriteContentAiService {
       return WriteContentHelper.failJob(this.prisma, job.id, errorCode, getAiErrorMessage(errorCode));
     }
 
-    const sectionsMap = new Map<string, string>();
-    let hasResumed = false;
-    const subscription = streamObservable.subscribe({
-      next: async (chunk: Record<string, unknown>) => {
-        try {
-          if (chunk.disable_edit !== undefined && chunk.section && !hasResumed) {
-            hasResumed = true;
-            this.logger.log(`Reached chapter breakpoint for ${(chunk.section as Record<string, unknown>).section_code}, auto-resuming...`);
-            const resumePayload = {
-              ...payload,
-              session_id: randomUUID(),
-              resume: false,
-              resumeCharacter: true,
-            };
-            void this.kafkaProducer.publish(topic, resumePayload).catch((err: Error) => {
-              this.logger.error(`Failed to publish auto-resume: ${err.message}`);
-            });
-            return;
-          }
-
-          this.streamingManager.emitChunk(streamKey, chunk);
-          const res = await WriteContentHelper.handleChunk(
-            this.prisma,
-            job.id,
-            chunk,
-            sectionsMap,
-            dto.documentId,
-          );
-          if (res.isFinished || res.isSuspended) {
-            this.streamingManager.completeStream(streamKey);
-            subscription.unsubscribe();
-          }
-        } catch (err) {
-          this.logger.error(`Error handling streaming chunk: ${(err as Error).message}`);
-        }
-      },
-      error: async (err: unknown) => {
-        const errorMsg = (err as Error)?.message || getAiErrorMessage(errorCode);
-        await this.prisma.job.update({
-          where: { id: job.id },
-          data: { status: JobStatus.error, errorCode: String(errorCode), errorMessage: errorMsg },
-        });
-        this.streamingManager.destroyStream(streamKey);
-        subscription.unsubscribe();
-      },
-    });
-
-    void pendingPromise.catch(async (err: unknown) => {
-      const code = (err as Record<string, unknown>)?.error_code || errorCode;
-      const msg =
-        (err as Record<string, unknown>)?.error ||
-        (err as Error)?.message ||
-        getAiErrorMessage(errorCode);
-
-      await this.prisma.job.update({
-        where: { id: job.id },
-        data: { status: JobStatus.error, errorCode: String(code), errorMessage: String(msg) },
-      });
-      this.streamingManager.destroyStream(streamKey);
-      subscription.unsubscribe();
+    WriteContentStreamHelper.attachStreamHandlers({
+      streamObservable,
+      pendingPromise,
+      streamKey,
+      jobId: job.id,
+      documentId: dto.documentId,
+      errorCode,
+      prisma: this.prisma,
+      streamingManager: this.streamingManager,
+      logger: this.logger,
     });
 
     return { jobId: job.id, streamKey, threadId, status: 'started' };
   }
 
   /**
+   * BE-030: Multi-turn resume cho chuyen_de_1 (sau khi ngắt chapter_break)
+   */
+  async resumeChapter(userId: string, documentId: string, dto: ResumeChapterDto) {
+    await this.ensureOwnedDocument(userId, documentId);
+    return WriteContentResumeHelper.resumeChapter(this.resumeContext, userId, documentId, dto);
+  }
+
+  /**
    * T-11: hoàn tất job đang treo ở bước `need_data_analyze`.
-   * FE chạy `analyzer` xong → gửi `analyzeLog` để AI viết tiếp từ checkpoint Redis
-   * (`resume: true` + `analyze_log`, giữ nguyên `thread_id` của job đang treo).
    */
   async resumeAfterDataAnalysis(
     userId: string,
@@ -203,87 +196,12 @@ export class WriteContentAiService {
     dto: ResumeDataAnalysisDto,
   ) {
     await this.ensureOwnedDocument(userId, documentId);
-
-    const job = await this.prisma.job.findFirst({
-      where: {
-        documentId,
-        status: JobStatus.suspended,
-        resumeStep: 'need_data_analyze',
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-
-    if (!job) {
-      throw new NotFoundException(
-        'Không có job nào đang chờ dữ liệu phân tích (need_data_analyze) cho tài liệu này',
-      );
-    }
-
-    const previousPayload =
-      typeof job.payload === 'object' && job.payload !== null
-        ? (job.payload as Record<string, unknown>)
-        : {};
-
-    const threadId = dto.threadId || job.threadId || randomUUID();
-    const payload: Record<string, unknown> = {
-      ...previousPayload,
-      user_id: userId,
-      document_id: WriteContentMongoHelper.toMongoDocId(documentId),
-      thread_id: threadId,
-      job_id: job.id,
-      resume: true,
-      analyze_log: dto.analyzeLog,
-      detailed_logs: dto.detailedLogs ?? previousPayload.detailed_logs,
-      generated_files: dto.generatedFiles ?? previousPayload.generated_files,
-    };
-
-    const updatedJob = await this.prisma.job.update({
-      where: { id: job.id },
-      data: {
-        status: JobStatus.processing,
-        resumeStep: 'writing_after_analysis',
-        threadId,
-        payload: payload as Prisma.InputJsonValue,
-        errorCode: null,
-        errorMessage: null,
-      },
-    });
-
-    const topic =
-      this.configService.get<string>('kafka.topics.write_report.request') ||
-      'write_section_request_local';
-
-    try {
-      await this.kafkaProducer.publish(topic, payload);
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : 'Publish to Kafka failed';
-      await this.prisma.job.update({
-        where: { id: job.id },
-        data: {
-          status: JobStatus.error,
-          errorCode: '610',
-          errorMessage: message,
-        },
-      });
-      throw new BadRequestException(
-        `Không gửi được yêu cầu viết tiếp sau phân tích: ${message}`,
-      );
-    }
-
-    this.logger.log(
-      `[resume-data-analysis] job ${job.id} viết tiếp cho ${documentId} (thread ${threadId})`,
+    return WriteContentResumeHelper.resumeAfterDataAnalysis(
+      this.resumeContext,
+      userId,
+      documentId,
+      dto,
     );
-
-    return {
-      job_id: updatedJob.id,
-      event_type: String(previousPayload.event_type ?? 'write_content'),
-      document_id: documentId,
-      thread_id: threadId,
-      status: updatedJob.status,
-      resume_step: 'writing_after_analysis',
-      stream: `/reports/${documentId}/write-stream`,
-    };
   }
 
   async getWriteStream(userId: string, documentId: string, eventType = 'write_content') {

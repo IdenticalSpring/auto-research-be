@@ -13,25 +13,21 @@ export class JobsKafkaConsumer {
     private readonly prisma: PrismaService,
   ) {}
 
-  @EventPattern('document_setup_response_local')
   @EventPattern('document_setup_response')
   async handleDocumentSetupResponse(@Payload() data: any) {
     await this.processWorkerResponse('document_setup', data);
   }
 
-  @EventPattern('write_section_response_local')
   @EventPattern('write_section_response')
   async handleWriteSectionResponse(@Payload() data: any) {
     await this.processWorkerResponse('write_report', data);
   }
 
-  @EventPattern('chatbot_response_local')
   @EventPattern('chatbot_response')
   async handleChatbotResponse(@Payload() data: any) {
     await this.processWorkerResponse('chatbot', data);
   }
 
-  @EventPattern('enhancement_response_local')
   @EventPattern('enhancement_response')
   async handleEnhancementResponse(@Payload() data: any) {
     await this.processWorkerResponse('enhancement', data);

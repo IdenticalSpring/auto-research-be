@@ -73,7 +73,7 @@ describe('ReferenceService - SearchPapers & Journals', () => {
     mockConfigService = {
       get: jest.fn<any>((key: string) => {
         if (key === 'kafka.topics.document_setup.request') {
-          return 'document_setup_request_local';
+          return 'document_setup_request';
         }
         return undefined;
       }),
@@ -145,7 +145,7 @@ describe('ReferenceService - SearchPapers & Journals', () => {
       expect(result.papers).toHaveLength(1);
       expect(result.papers[0].title).toBe('Deep Learning in Education');
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'document_setup_request_local',
+        'document_setup_request',
         expect.objectContaining({ event_type: 'search_papers' }),
       );
     });
@@ -215,7 +215,7 @@ describe('ReferenceService - SearchPapers & Journals', () => {
       const result = await service.getJournals(1700000000);
       expect(result).toBeDefined();
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'document_setup_request_local',
+        'document_setup_request',
         expect.objectContaining({ event_type: 'get_journals' }),
       );
     });

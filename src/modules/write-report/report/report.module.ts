@@ -6,6 +6,7 @@ import { WriteContentStreamController } from './write-content-stream.controller'
 import { ReportService } from './report.service';
 import { TranslateAiService } from './translate-ai.service';
 import { DeleteReportAiService } from './delete-report-ai.service';
+import { EditReportAiService } from './edit-report-ai.service';
 import { WriteContentAiService } from './write-content-ai.service';
 
 @Module({
@@ -20,12 +21,14 @@ import { WriteContentAiService } from './write-content-ai.service';
     WriteContentAiService,
     TranslateAiService,
     DeleteReportAiService,
+    EditReportAiService,
   ],
   exports: [
     ReportService,
     WriteContentAiService,
     TranslateAiService,
     DeleteReportAiService,
+    EditReportAiService,
   ],
 })
 export class ReportModule {}

@@ -12,7 +12,7 @@ import {
   GetSuggestionsDto,
 } from './dto/enhancement-ai.dto';
 import { EnhancementAiHelper } from './enhancement-ai.helper';
-import { AI_DEFAULT_MODEL } from '../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../common/kafka/kafka.constants';
 
 @Injectable()
 export class EnhancementAiService {
@@ -36,7 +36,7 @@ export class EnhancementAiService {
 
     const kafkaPayload = {
       event_type: 'ai_in_doc',
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: dto.documentId,
       session_id: sessionId,
@@ -77,7 +77,7 @@ export class EnhancementAiService {
 
     const kafkaPayload = {
       event_type: 'get_suggestions',
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: dto.documentId,
       session_id: sessionId,
@@ -124,7 +124,7 @@ export class EnhancementAiService {
 
     const kafkaPayload = {
       event_type: 'enhance',
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: dto.documentId,
       session_id: sessionId,
@@ -161,7 +161,7 @@ export class EnhancementAiService {
 
     const kafkaPayload = {
       event_type: 'enhance_all',
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: dto.documentId,
       session_id: sessionId,
@@ -195,7 +195,7 @@ export class EnhancementAiService {
   private getTopic(): string {
     return (
       this.configService.get<string>('kafka.topics.enhancement.request') ||
-      'enhancement_request_local'
+      'enhancement_request'
     );
   }
 }

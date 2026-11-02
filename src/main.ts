@@ -1,3 +1,5 @@
+// PHẢI đứng đầu tiên: nạp .env trước khi mọi hằng số đọc process.env được evaluate.
+import { logResolvedAiModel } from './config/env.loader';
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -6,13 +8,18 @@ import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { KafkaTunnelHelper } from './common/kafka/kafka-tunnel.helper';
+import { installTimeoutNegativeWarningSilencer } from './common/utils/process-warning-guard';
 
 async function bootstrap() {
+  // Lọc warning timeout âm phát sinh bên trong kafkajs 2.2.4 (lỗi upstream,
+  // xem src/common/utils/process-warning-guard.ts) để log khởi động sạch.
+  installTimeoutNegativeWarningSilencer();
   const rawBrokersEnv =
     process.env.KAFKA || process.env.KAFKA_BROKERS || '167.254.70.125:9092';
   KafkaTunnelHelper.startProxyIfRemote(rawBrokersEnv);
 
   const logger = new Logger('Bootstrap');
+  logResolvedAiModel();
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
@@ -48,6 +55,18 @@ async function bootstrap() {
   logger.log(
     `🚀 Application is running on: http://localhost:${port}/${apiPrefix}`,
   );
+
+  // F3: route không khớp do Express trả HTML và bỏ qua AllExceptionsFilter.
+  // Đăng ký sau khi listen ⇒ middleware chạy cuối, trả JSON thống nhất.
+  app.getHttpAdapter().getInstance().use((req: any, res: any) => {
+    res.status(404).json({
+      statusCode: 404,
+      error: 'Not Found',
+      message: `Cannot ${req.method} ${req.originalUrl}`,
+      path: req.originalUrl,
+      timestamp: new Date().toISOString(),
+    });
+  });
 
   // Chỉ kết nối Kafka khi `kafka.enabled` = true (nguồn: KAFKA_ENABLED trong .env)
   if (kafkaEnabled) {

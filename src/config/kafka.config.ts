@@ -19,11 +19,23 @@ export function resolveKafkaEnabled(raw: string | undefined): boolean {
   return raw.trim().toLowerCase() === 'true';
 }
 
+export function resolveKafkaTopicSuffix(
+  explicitSuffix?: string,
+  _useLocalTopics?: string | boolean,
+): string {
+  if (explicitSuffix !== undefined) {
+    return explicitSuffix;
+  }
+  return '';
+}
+
 export default registerAs('kafka', () => {
   const enabled = resolveKafkaEnabled(process.env.KAFKA_ENABLED);
-  const isLocal =
-    process.env.IS_LOCAL === 'true' || process.env.NODE_ENV !== 'production';
-  const suffix = isLocal ? '_local' : '';
+  const suffix = resolveKafkaTopicSuffix(
+    process.env.KAFKA_TOPIC_SUFFIX,
+    process.env.KAFKA_USE_LOCAL_TOPICS,
+  );
+  const isLocal = false;
 
   const rawBrokers =
     process.env.KAFKA || process.env.KAFKA_BROKERS || '167.254.70.125:9092';

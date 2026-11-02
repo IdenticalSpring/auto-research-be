@@ -20,9 +20,9 @@ export class AiErrorDto {
 }
 
 export class HealthCheckWebhookDto {
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  eventType!: string;
+  eventType?: string;
 
   @IsInt()
   @Min(1)

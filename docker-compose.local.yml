@@ -30,7 +30,10 @@ services:
       IS_LOCAL: "true"
       PORT: 3001
       DATABASE_URL: postgresql://postgres:postgres@auto-research-postgres:5432/autoresearch?schema=public
-      KAFKA: ${KAFKA:-167.254.70.125:9092}
+      KAFKA: ${KAFKA:-kafka:29092}
+    networks:
+      - default
+      - autoresearching-net
     volumes:
       # Bind mount project source for live hot-reload
       - ./:/app
@@ -62,3 +65,5 @@ volumes:
 networks:
   default:
     name: auto-research-be-net
+  autoresearching-net:
+    external: true

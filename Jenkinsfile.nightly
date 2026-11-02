@@ -1,0 +1,127 @@
+// Nightly quality gate: coverage + E2E (không cần AI), và E2E live khi bật RUN_LIVE.
+//
+// Vì sao tách khỏi Jenkinsfile (deploy): job deploy chạy theo push/merge và phải
+// nhanh; job này chạy hằng đêm, cần AI server + thời gian dài, và fail khi
+// verdict E2E là `NOT DONE`.
+//
+// Artifact: reports/e2e-*.json (máy đọc) + coverage/lcov.info.
+pipeline {
+  agent {
+    label 'docker-node'
+  }
+
+  triggers {
+    cron('H 2 * * *')
+  }
+
+  parameters {
+    booleanParam(
+      name: 'RUN_LIVE',
+      defaultValue: false,
+      description: 'Chạy T4 live (cần AI server reachable + model trong AI_ALLOWED_MODELS)'
+    )
+    string(
+      name: 'LIVE_TIER',
+      defaultValue: 'smoke',
+      description: 'Tier cho T4 live: smoke | core | full'
+    )
+  }
+
+  options {
+    timestamps()
+    disableConcurrentBuilds()
+    skipDefaultCheckout(true)
+    buildDiscarder(logRotator(numToKeepStr: '30'))
+  }
+
+  environment {
+    APP_NAME = 'auto-research-be'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        timeout(time: 30, unit: 'MINUTES') {
+          checkout([
+            $class: 'GitSCM',
+            branches: scm.branches,
+            userRemoteConfigs: scm.userRemoteConfigs,
+            extensions: [
+              [$class: 'CloneOption', shallow: true, depth: 1, noTags: true, timeout: 30]
+            ]
+          ])
+        }
+      }
+    }
+
+    stage('Install') {
+      steps {
+        sh 'npm ci'
+      }
+    }
+
+    stage('Lint') {
+      steps {
+        sh 'npm run lint'
+      }
+    }
+
+    // Gate chất lượng: .c8rc.json quy định ngưỡng (lines/statements/functions/branches).
+    stage('Coverage') {
+      steps {
+        sh 'npm run test:cov'
+      }
+      post {
+        always {
+          archiveArtifacts artifacts: 'coverage/lcov.info', allowEmptyArchive: true
+        }
+      }
+    }
+
+    stage('Build') {
+      steps {
+        sh 'npm run build'
+      }
+    }
+
+    // T0+T2+T3: không cần AI server, dùng fake AI server trong container.
+    stage('E2E offline (preflight+http+kafka)') {
+      steps {
+        sh 'npm run e2e:kafka'
+      }
+    }
+
+    stage('E2E live') {
+      when {
+        expression { return params.RUN_LIVE }
+      }
+      environment {
+        E2E_WITH_INFRA = '1'   // bắt buộc: thiếu là 6 case infra SKIP mà verdict vẫn DONE
+      }
+      steps {
+        sh "npm run e2e:full -- --live-tier=${params.LIVE_TIER}"
+      }
+    }
+
+    stage('E2E cleanup') {
+      when { expression { return params.RUN_LIVE } }
+      steps {
+        sh 'npm run e2e:cleanup-collections || true'
+      }
+    }
+  }
+
+  post {
+    always {
+      // run-all.ts exit 1 khi verdict = NOT DONE ⇒ build đỏ, artifact vẫn giữ để tra cứu.
+      archiveArtifacts artifacts: 'reports/e2e-*.json', allowEmptyArchive: true
+      sh 'docker image prune -f --filter "dangling=true" || true'
+    }
+    unsuccessful {
+      echo '❌ Nightly quality gate FAIL — kiểm tra artifact reports/e2e-*.json'
+    }
+    success {
+      echo '✅ Nightly quality gate PASS'
+    }
+  }
+}

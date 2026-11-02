@@ -102,11 +102,11 @@ export class ReferenceService {
 
     const pendingPromise = this.correlationService.registerPending<
       Record<string, unknown>
-    >(correlationKey, 120000, 'search_papers', job.id);
+    >(correlationKey, undefined, 'search_papers', job.id);
 
     const topic =
       this.configService.get<string>('kafka.topics.document_setup.request') ||
-      'document_setup_request_local';
+      'document_setup_request';
 
     try {
       await this.kafkaProducer.publish(topic, payload);
@@ -181,11 +181,11 @@ export class ReferenceService {
     }
   }
 
-  async getJournals(lastUpdated?: number) {
+  async getJournals(lastUpdated?: number | string) {
     const sessionId = `sess-journal-${randomUUID()}`;
     const topic =
       this.configService.get<string>('kafka.topics.document_setup.request') ||
-      'document_setup_request_local';
+      'document_setup_request';
     const correlationKey = this.correlationService.buildCorrelationKey({
       userId: 'system',
       documentId: 'system',
@@ -194,12 +194,12 @@ export class ReferenceService {
     });
     const pending = this.correlationService.registerPending<Record<string, unknown>>(
       correlationKey,
-      60000,
+      undefined,
       'get_journals',
     );
     await this.kafkaProducer.publish(topic, {
       event_type: 'get_journals',
-      last_updated: lastUpdated || Date.now(),
+      last_updated: String(lastUpdated ?? new Date().getFullYear()),
       session_id: sessionId,
       user_id: 'system',
       document_id: 'system',

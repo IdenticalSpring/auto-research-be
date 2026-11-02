@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../../database/prisma.service';
@@ -35,6 +35,7 @@ describe('DataAnalysisAiService', () => {
         findFirst: jest.fn(() =>
           Promise.resolve({ id: 'ds-1', documentId: 'doc-1' }),
         ),
+        update: jest.fn(() => Promise.resolve({})),
       },
       job: {
         create: jest.fn(() => Promise.resolve({ id: 'job-1' })),
@@ -44,11 +45,11 @@ describe('DataAnalysisAiService', () => {
     producerMock = { publish: jest.fn(() => Promise.resolve()) };
     correlationMock = {
       buildCorrelationKey: jest.fn(() => 'key-1'),
-      registerPending: jest.fn(() => Promise.resolve({ comments: [] })),
+      registerPending: jest.fn(() => Promise.resolve({ comments: ['Hợp lệ'] })),
       clearPending: jest.fn(),
     };
     const configMock = {
-      get: jest.fn(() => 'write_section_request_local'),
+      get: jest.fn(() => 'write_section_request'),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -64,7 +65,7 @@ describe('DataAnalysisAiService', () => {
     service = module.get<DataAnalysisAiService>(DataAnalysisAiService);
   });
 
-  it('comment_data: gửi đúng event_type + luôn kèm 3 identifier + thread_id', async () => {
+  it('comment_data: gửi đúng event_type + luôn kèm 3 identifier + thread_id và lưu analyzeLog', async () => {
     const res = await service.commentData('user-1', 'ds-1', commentBody as any);
 
     const payload = producerMock.publish.mock.calls[0][1] as Record<
@@ -83,6 +84,12 @@ describe('DataAnalysisAiService', () => {
       'comment_data',
       'job-1',
     );
+    expect(prismaMock.dataset.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'ds-1' },
+        data: { analyzeLog: JSON.stringify(['Hợp lệ']) },
+      }),
+    );
     expect(res.job_id).toBe('job-1');
     expect(res.event_type).toBe('comment_data');
   });
@@ -99,6 +106,28 @@ describe('DataAnalysisAiService', () => {
     expect(payload.document_id).toBe('doc-1');
     expect(payload.variables).toHaveLength(1);
     expect(payload.thread_id).toBeUndefined();
+  });
+
+  it('AI trả rejection ⇒ cập nhật job error và ném BadRequestException', async () => {
+    correlationMock.registerPending.mockRejectedValueOnce({
+      error_code: 636,
+      error: 'Data distribution error',
+    });
+
+    await expect(
+      service.commentData('user-1', 'ds-1', commentBody as any),
+    ).rejects.toThrow(BadRequestException);
+
+    expect(prismaMock.job.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'job-1' },
+        data: expect.objectContaining({
+          status: 'error',
+          errorCode: '636',
+          errorMessage: 'Data distribution error',
+        }),
+      }),
+    );
   });
 
   it('dataset của user khác ⇒ 404 và không publish', async () => {

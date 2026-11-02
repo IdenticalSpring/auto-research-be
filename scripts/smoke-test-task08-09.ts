@@ -1,5 +1,6 @@
 import { Kafka, logLevel } from 'kafkajs';
 import { randomUUID } from 'node:crypto';
+import { resolveScriptModelId } from './lib/ai-model';
 
 interface TestResult {
   task: string;
@@ -11,14 +12,10 @@ interface TestResult {
 }
 
 const BROKER = process.env.KAFKA || '167.254.70.125:9092';
-const REQUEST_TOPIC = 'write_section_request_local';
-const RESPONSE_TOPIC = 'write_section_response_local';
+const REQUEST_TOPIC = 'write_section_request';
+const RESPONSE_TOPIC = 'write_section_response';
 const TIMEOUT_MS = Number(process.env.TIMEOUT_MS) || 60000;
-const MODEL_ID =
-  process.env.AI_DEFAULT_MODEL ||
-  process.env.MODEL_ID ||
-  process.env.DEFAULT_AI_MODEL ||
-  'gemini-3.5-flash-lite';
+const MODEL_ID = resolveScriptModelId();
 
 const USER_ID = '00000000-0000-0000-0000-000000000001';
 // 24-character hex ID compatible with PyMongo ObjectId

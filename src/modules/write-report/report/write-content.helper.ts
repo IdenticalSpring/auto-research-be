@@ -51,6 +51,10 @@ export class WriteContentHelper {
       }
     }
 
+    if (dto.practicalData && finalProposal) {
+      finalProposal = { ...finalProposal, practical_data: dto.practicalData };
+    }
+
     let rawOutline =
       dto.outline && typeof dto.outline === 'object' && Object.keys(dto.outline).length > 0
         ? (dto.outline as Record<string, unknown>)
@@ -130,6 +134,7 @@ export class WriteContentHelper {
         word_count: item.word_count || '1000-1500',
         sections,
         subheadings: sections,
+        subsections: sections,
       };
     });
 
@@ -203,27 +208,20 @@ export class WriteContentHelper {
       });
     }
 
+    if (chunk.chapter_break === true || chunk.__interrupt__ === true) {
+      await prisma.job.update({ where: { id: jobId }, data: { status: JobStatus.suspended, resumeStep: 'chapter_break', threadId, result: chunk as unknown as Prisma.InputJsonValue } });
+      return { isSuspended: true, reason: 'chapter_break' };
+    }
     if (chunk.need_data_analyze === true) {
-      await prisma.job.update({
-        where: { id: jobId },
-        data: { status: JobStatus.suspended, resumeStep: 'need_data_analyze', threadId, result: chunk as unknown as Prisma.InputJsonValue },
-      });
+      await prisma.job.update({ where: { id: jobId }, data: { status: JobStatus.suspended, resumeStep: 'need_data_analyze', threadId, result: chunk as unknown as Prisma.InputJsonValue } });
       return { isSuspended: true, reason: 'need_data_analyze' };
     }
-
     if (chunk.need_propose_method === true) {
-      await prisma.job.update({
-        where: { id: jobId },
-        data: { status: JobStatus.suspended, resumeStep: 'need_propose_method', threadId, result: chunk as unknown as Prisma.InputJsonValue },
-      });
+      await prisma.job.update({ where: { id: jobId }, data: { status: JobStatus.suspended, resumeStep: 'need_propose_method', threadId, result: chunk as unknown as Prisma.InputJsonValue } });
       return { isSuspended: true, reason: 'need_propose_method' };
     }
-
     if (chunk.has_finished === true) {
-      await prisma.job.update({
-        where: { id: jobId },
-        data: { status: JobStatus.finished, threadId, result: chunk as unknown as Prisma.InputJsonValue },
-      });
+      await prisma.job.update({ where: { id: jobId }, data: { status: JobStatus.finished, threadId, result: chunk as unknown as Prisma.InputJsonValue } });
       return { isFinished: true };
     }
 

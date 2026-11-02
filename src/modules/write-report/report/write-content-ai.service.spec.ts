@@ -10,6 +10,7 @@ import { RequestCorrelationService } from '../../../messaging/request-correlatio
 import { StreamingManagerService } from '../../../common/streaming/streaming-manager.service';
 import { WriteContentAiService } from './write-content-ai.service';
 import { WriteContentRequestDto } from './dto/write-content-request.dto';
+import { WriteContentMongoHelper } from './write-content-mongo.helper';
 
 describe('WriteContentAiService', () => {
   let service: WriteContentAiService;
@@ -47,6 +48,7 @@ describe('WriteContentAiService', () => {
         findFirst: jest.fn<any>(),
       },
       report: { upsert: jest.fn<any>().mockResolvedValue({}) },
+      dataset: { findFirst: jest.fn<any>().mockResolvedValue(null) },
     };
 
     mockKafkaProducer = { publish: jest.fn<any>().mockResolvedValue(undefined) };
@@ -73,12 +75,20 @@ describe('WriteContentAiService', () => {
         { provide: StreamingManagerService, useValue: mockStreamingManager },
         {
           provide: ConfigService,
-          useValue: { get: jest.fn<any>().mockReturnValue('write_section_request_local') },
+          useValue: { get: jest.fn<any>().mockReturnValue('write_section_request') },
         },
       ],
     }).compile();
 
     service = module.get<WriteContentAiService>(WriteContentAiService);
+
+    jest
+      .spyOn(WriteContentMongoHelper, 'ensureMongoReady')
+      .mockImplementation(() => Promise.resolve());
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('startWriteContent', () => {
@@ -95,7 +105,7 @@ describe('WriteContentAiService', () => {
       expect(res.status).toBe('started');
       expect(res.jobId).toBe('job-wc-1');
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'write_section_request_local',
+        'write_section_request',
         expect.objectContaining({ event_type: 'write_content' }),
       );
 
@@ -133,6 +143,27 @@ describe('WriteContentAiService', () => {
       );
     });
 
+    it('should suspend job when chapter_break or __interrupt__ flag is received', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockCorrelation.registerPending.mockReturnValue(new Promise(() => {}));
+
+      await service.startWriteContent(userId, validDto);
+      streamSubject.next({ chapter_break: true, __interrupt__: true, thread_id: 'thread-break-1' });
+      await new Promise((r) => setTimeout(r, 10));
+
+      expect(mockPrisma.job.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: 'job-wc-1' },
+          data: expect.objectContaining({
+            status: JobStatus.suspended,
+            resumeStep: 'chapter_break',
+            threadId: 'thread-break-1',
+          }),
+        }),
+      );
+      expect(mockStreamingManager.completeStream).toHaveBeenCalledWith('stream-key-wc');
+    });
+
     it('should suspend job when need_propose_method flag is received', async () => {
       mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
       mockCorrelation.registerPending.mockReturnValue(new Promise(() => {}));
@@ -165,7 +196,7 @@ describe('WriteContentAiService', () => {
       });
       expect(res.threadId).toBe('thread-123');
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'write_section_request_local',
+        'write_section_request',
         expect.objectContaining({
           thread_id: 'thread-123',
           resume: true,
@@ -184,6 +215,66 @@ describe('WriteContentAiService', () => {
       expect(mockPrisma.job.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({ errorCode: '632' }),
+        }),
+      );
+    });
+
+    it('should support chuyen_de_2 with practicalData and error code 633', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockCorrelation.registerPending.mockReturnValue(new Promise(() => {}));
+
+      const practicalData = { revenue_2023: 500000000, market_share: '15%' };
+      const res = await service.startWriteContent(userId, {
+        ...validDto,
+        eventType: 'chuyen_de_2',
+        practicalData,
+      });
+
+      expect(res.status).toBe('started');
+      expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
+        'write_section_request',
+        expect.objectContaining({
+          event_type: 'chuyen_de_2',
+          practical_data: practicalData,
+          final_proposal: expect.objectContaining({ practical_data: practicalData }),
+        }),
+      );
+    });
+
+    it('should support chuyen_de_3 and auto-resolve OLS results from Dataset', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockPrisma.dataset.findFirst.mockResolvedValue({
+        filePath: 'https://minio/dataset.csv',
+        rawData: [{ y: 10, x: 5 }],
+        analysisResults: { r_squared: 0.92, p_value: 0.001 },
+        analyzeLog: 'OLS regression model completed',
+        detailedLogs: [{ step: 'OLS', coef: 2.1 }],
+        generatedFiles: { plot: 'https://minio/plot.png' },
+        variables: [
+          { variableName: 'GDP', variableRole: 'dependent', variableType: 'observed' },
+          { variableName: 'FDI', variableRole: 'independent', variableType: 'observed' },
+        ],
+      });
+      mockCorrelation.registerPending.mockReturnValue(new Promise(() => {}));
+
+      const res = await service.startWriteContent(userId, {
+        ...validDto,
+        eventType: 'chuyen_de_3',
+      });
+
+      expect(res.status).toBe('started');
+      expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
+        'write_section_request',
+        expect.objectContaining({
+          event_type: 'chuyen_de_3',
+          analyze_log: 'OLS regression model completed',
+          data: expect.objectContaining({
+            dataset_url: 'https://minio/dataset.csv',
+          }),
+          variables: expect.arrayContaining([
+            expect.objectContaining({ variable_name: 'GDP', role: 'dependent' }),
+            expect.objectContaining({ variable_name: 'FDI', role: 'independent' }),
+          ]),
         }),
       );
     });
@@ -216,7 +307,7 @@ describe('WriteContentAiService', () => {
         }),
       );
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'write_section_request_local',
+        'write_section_request',
         expect.objectContaining({
           resume: true,
           analyze_log: '{"p_value":0.03}',
@@ -250,6 +341,76 @@ describe('WriteContentAiService', () => {
 
       await expect(
         service.resumeAfterDataAnalysis(userId, documentId, { analyzeLog: 'x' }),
+      ).rejects.toBeInstanceOf(BadRequestException);
+      expect(mockPrisma.job.update).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ errorCode: '610' }),
+        }),
+      );
+    });
+  });
+
+  describe('resumeChapter', () => {
+    it('should resume suspended job with resumeCharacter: true and keep/forward threadId', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockPrisma.job.findFirst.mockResolvedValue({
+        id: 'job-suspended-ch',
+        threadId: 'thread-break-ch',
+        payload: { event_type: 'chuyen_de_1' },
+      });
+      mockPrisma.job.update.mockResolvedValue({
+        id: 'job-suspended-ch',
+        status: JobStatus.processing,
+      });
+      mockCorrelation.registerPending.mockReturnValue(new Promise(() => {}));
+
+      const result = await service.resumeChapter(userId, documentId, {
+        resumeCharacter: true,
+      });
+
+      expect(mockPrisma.job.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            documentId,
+            status: JobStatus.suspended,
+            resumeStep: 'chapter_break',
+          }),
+        }),
+      );
+      expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
+        'write_section_request',
+        expect.objectContaining({
+          resumeCharacter: true,
+          thread_id: 'thread-break-ch',
+          event_type: 'chuyen_de_1',
+        }),
+      );
+      expect(result.status).toBe('resumed');
+      expect(result.threadId).toBe('thread-break-ch');
+    });
+
+    it('should throw NotFoundException when no suspended job at chapter_break exists', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockPrisma.job.findFirst.mockResolvedValue(null);
+
+      await expect(
+        service.resumeChapter(userId, documentId, { resumeCharacter: true }),
+      ).rejects.toBeInstanceOf(NotFoundException);
+      expect(mockKafkaProducer.publish).not.toHaveBeenCalled();
+    });
+
+    it('should map publish failure to job error 610 and BadRequest', async () => {
+      mockPrisma.document.findUnique.mockResolvedValue({ id: documentId });
+      mockPrisma.job.findFirst.mockResolvedValue({
+        id: 'job-suspended-ch2',
+        threadId: 'thread-fail',
+        payload: { event_type: 'chuyen_de_1' },
+      });
+      mockPrisma.job.update.mockResolvedValue({ id: 'job-suspended-ch2' });
+      mockKafkaProducer.publish.mockRejectedValue(new Error('kafka write fail'));
+
+      await expect(
+        service.resumeChapter(userId, documentId, { resumeCharacter: true }),
       ).rejects.toBeInstanceOf(BadRequestException);
       expect(mockPrisma.job.update).toHaveBeenLastCalledWith(
         expect.objectContaining({

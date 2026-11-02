@@ -29,14 +29,36 @@ export const ALL_BASE_TOPICS = [
   ENHANCEMENT_RESPONSE_TOPIC,
 ] as const;
 
-import { resolveAiModelConfig } from '../../config/ai-model.config';
+import {
+  AiModelConfig,
+  resolveAiModelConfig,
+} from '../../config/ai-model.config';
 
-export const AI_DEFAULT_MODEL = resolveAiModelConfig().defaultModel;
+/** Resolve MỘT lần để mọi hằng số bên dưới luôn nhất quán với nhau. */
+const initialAiModelConfig = resolveAiModelConfig();
+
+/**
+ * Model được chọn cho toàn hệ thống.
+ * Giá trị do `AI_DEFAULT_MODEL` quyết định (xem `resolveAiModelConfig`).
+ */
+export const AI_DEFAULT_MODEL = initialAiModelConfig.defaultModel;
 
 /** @deprecated Sử dụng AI_DEFAULT_MODEL thay thế. */
 export const DEFAULT_AI_MODEL = AI_DEFAULT_MODEL;
 
-export const SUPPORTED_KAFKA_MODELS = resolveAiModelConfig().allowedModels;
+/** Phần tử đầu tiên của whitelist — phương án dự phòng khi model mặc định lỗi. */
+export const AI_FALLBACK_MODEL = initialAiModelConfig.fallbackModel;
+
+export const SUPPORTED_KAFKA_MODELS = initialAiModelConfig.allowedModels;
+
+/**
+ * Resolve lại cấu hình tại thời điểm gọi.
+ * Dùng cho validation/DTO và các luồng cần phản ánh `process.env` hiện hành
+ * thay vì giá trị snapshot lúc import module.
+ */
+export function getAiModelConfig(): AiModelConfig {
+  return resolveAiModelConfig();
+}
 
 export type SupportedKafkaModel = string;
 
