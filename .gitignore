@@ -54,12 +54,15 @@ pids
 *.seed
 *.pid.lock
 
+# Output báo cáo test (tự sinh, không commit)
+reports/
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# Ignore mọi file markdown (trừ README)
+# Ignore mọi file markdown (trừ README.md ở gốc repo)
 *.md
-!README.md
+!/README.md
 
 # ==============================================================================
 # AI Assistants, Agent Rules & Task Tracking
