@@ -1,0 +1,130 @@
+{
+  "generatedAt": "2026-11-01T10:10:23.424Z",
+  "durationMs": 7741,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "kafka"
+    ],
+    "startedAt": 1793527815683
+  },
+  "cases": [
+    {
+      "id": "kafka.fake-ai-server",
+      "tier": "T3",
+      "feature": "Kết nối fake AI server + tạo probe topic",
+      "status": "PASS",
+      "durationMs": 273,
+      "modelId": "deepseek-flash",
+      "detail": "producer + consumer + probe topics ready"
+    },
+    {
+      "id": "jobs.document_setup",
+      "tier": "T3",
+      "feature": "jobs document_setup/generate_domains",
+      "status": "PASS",
+      "durationMs": 56,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "documentId": "b4897fc3-24db-47e4-a120-27020441e5c0",
+      "detail": "status=finished, envelope OK, key=b4897fc3-24db-47e4-a120-27020441e5c0:generate_domains"
+    },
+    {
+      "id": "jobs.write_report",
+      "tier": "T3",
+      "feature": "jobs write_report/chuyen_de_2",
+      "status": "PASS",
+      "durationMs": 517,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "documentId": "b4897fc3-24db-47e4-a120-27020441e5c0",
+      "detail": "status=finished, envelope OK, key=b4897fc3-24db-47e4-a120-27020441e5c0:chuyen_de_2"
+    },
+    {
+      "id": "jobs.chatbot",
+      "tier": "T3",
+      "feature": "jobs chatbot/outer_chatbot",
+      "status": "PASS",
+      "durationMs": 517,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "documentId": "b4897fc3-24db-47e4-a120-27020441e5c0",
+      "detail": "status=finished, envelope OK, key=b4897fc3-24db-47e4-a120-27020441e5c0:outer_chatbot"
+    },
+    {
+      "id": "jobs.enhancement",
+      "tier": "T3",
+      "feature": "jobs enhancement/ai_in_doc",
+      "status": "PASS",
+      "durationMs": 514,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "documentId": "b4897fc3-24db-47e4-a120-27020441e5c0",
+      "detail": "status=finished, envelope OK, key=b4897fc3-24db-47e4-a120-27020441e5c0:ai_in_doc"
+    },
+    {
+      "id": "jobs.error-mapping",
+      "tier": "T3",
+      "feature": "jobs enhancement/enhance",
+      "status": "PASS",
+      "durationMs": 513,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "documentId": "b4897fc3-24db-47e4-a120-27020441e5c0",
+      "detail": "status=error, envelope OK, key=b4897fc3-24db-47e4-a120-27020441e5c0:enhance"
+    },
+    {
+      "id": "jobs.suspend",
+      "tier": "T3",
+      "feature": "jobs write_report/chuyen_de_3",
+      "status": "PASS",
+      "durationMs": 516,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "documentId": "b4897fc3-24db-47e4-a120-27020441e5c0",
+      "detail": "status=suspended, envelope OK, key=b4897fc3-24db-47e4-a120-27020441e5c0:chuyen_de_3"
+    },
+    {
+      "id": "harness.early-response",
+      "tier": "T3",
+      "feature": "Response đến trước request (orphan store)",
+      "status": "PASS",
+      "durationMs": 803,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "detail": "lấy từ orphan trong 1ms"
+    },
+    {
+      "id": "harness.chunk-streaming",
+      "tier": "T3",
+      "feature": "Streaming chunk has_finished=false rồi true",
+      "status": "PASS",
+      "durationMs": 306,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "detail": "nhận 2 chunk rồi finished"
+    },
+    {
+      "id": "harness.api-error",
+      "tier": "T3",
+      "feature": "error_code từ response ⇒ fail-fast kèm mã lỗi",
+      "status": "PASS",
+      "durationMs": 302,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "detail": "reject đúng: AI Error 633: UnboundLocalError current_report"
+    }
+  ],
+  "totals": {
+    "total": 10,
+    "pass": 10,
+    "fail": 0,
+    "skip": 0
+  }
+}

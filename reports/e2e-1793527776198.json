@@ -1,0 +1,341 @@
+{
+  "generatedAt": "2026-11-01T10:09:36.198Z",
+  "durationMs": 3380,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "preflight",
+      "http",
+      "kafka"
+    ],
+    "startedAt": 1793527772818
+  },
+  "cases": [
+    {
+      "id": "env.required",
+      "tier": "T0",
+      "feature": "Env bắt buộc có đủ",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "model=deepseek-flash, broker=kafka:29092"
+    },
+    {
+      "id": "env.model-whitelist",
+      "tier": "T0",
+      "feature": "Model mặc định thuộc whitelist",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "requested=selected=deepseek-flash"
+    },
+    {
+      "id": "prisma.validate",
+      "tier": "T0",
+      "feature": "Prisma schema hợp lệ",
+      "status": "PASS",
+      "durationMs": 1450,
+      "modelId": "deepseek-flash",
+      "detail": "prisma validate OK"
+    },
+    {
+      "id": "postgres.reachable",
+      "tier": "T0",
+      "feature": "Postgres reachable",
+      "status": "PASS",
+      "durationMs": 71,
+      "modelId": "deepseek-flash",
+      "detail": "19 bảng trong schema public"
+    },
+    {
+      "id": "prisma.migration-history",
+      "tier": "T0",
+      "feature": "Lịch sử migration",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "DB không được quản lý bởi Prisma Migrate (dự án dùng db push) — gap triển khai"
+    },
+    {
+      "id": "kafka.reachable",
+      "tier": "T0",
+      "feature": "Kafka reachable",
+      "status": "PASS",
+      "durationMs": 26,
+      "modelId": "deepseek-flash",
+      "detail": "17 topic"
+    },
+    {
+      "id": "ai-server.reachable",
+      "tier": "T0",
+      "feature": "AI server reachable",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "bỏ qua vì không chạy tier live"
+    },
+    {
+      "id": "auth.register-login",
+      "tier": "T2",
+      "feature": "Register/Login lấy JWT",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "email=e2e-1793527775750@e2e.local"
+    },
+    {
+      "id": "guard.documents",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /documents",
+      "status": "PASS",
+      "durationMs": 4,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.document-keywords",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /document-keywords",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.proposals",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /proposals",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.outlines",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /outlines",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.references",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /references",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.uploaded-documents",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /uploaded-documents",
+      "status": "PASS",
+      "durationMs": 3,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.datasets",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /datasets",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.dataset-variables",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /dataset-variables",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.proposed-methods",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /proposed-methods",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.generated-slides",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /generated-slides",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.reports",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /reports",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.chat-sessions",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /chat-sessions",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.chat-messages",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /chat-messages",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.enhancement-sessions",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /enhancement-sessions",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.enhancement-suggestions",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /enhancement-suggestions",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.users",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /users",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "documents.create",
+      "tier": "T2",
+      "feature": "POST /documents",
+      "status": "PASS",
+      "durationMs": 6,
+      "modelId": "deepseek-flash",
+      "detail": "id=245dba22-845f-41d6-89bd-7d4411c8e707"
+    },
+    {
+      "id": "documents.validation",
+      "tier": "T2",
+      "feature": "POST /documents numberOfDomains âm ⇒ 400",
+      "status": "PASS",
+      "durationMs": 3,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 400 (no message)"
+    },
+    {
+      "id": "documents.list",
+      "tier": "T2",
+      "feature": "GET /documents có bản ghi mới",
+      "status": "PASS",
+      "durationMs": 3,
+      "modelId": "deepseek-flash",
+      "detail": "1 document"
+    },
+    {
+      "id": "chat-session.model-sync",
+      "tier": "T2",
+      "feature": "ChatSession lưu đúng model cấu hình (B3)",
+      "status": "PASS",
+      "durationMs": 13,
+      "modelId": "deepseek-flash",
+      "detail": "model=deepseek-flash"
+    },
+    {
+      "id": "datasets.crud",
+      "tier": "T2",
+      "feature": "Dataset CRUD",
+      "status": "PASS",
+      "durationMs": 15,
+      "modelId": "deepseek-flash",
+      "detail": "create→update→delete OK (cdcb8cbc-340b-4c89-87d1-0011cb334097)"
+    },
+    {
+      "id": "health-check.status",
+      "tier": "T2",
+      "feature": "GET /health-check/:id",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "processStatus=1, eventType=unknown"
+    },
+    {
+      "id": "token-usage.summary",
+      "tier": "T2",
+      "feature": "GET /token-usage/user/:id",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "shape OK"
+    },
+    {
+      "id": "error.404-handling",
+      "tier": "T2",
+      "feature": "Route không tồn tại ⇒ 404",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "404 (Express HTML — không qua AllExceptionsFilter)"
+    },
+    {
+      "id": "documents.cleanup",
+      "tier": "T2",
+      "feature": "DELETE /documents/:id",
+      "status": "PASS",
+      "durationMs": 3,
+      "modelId": "deepseek-flash",
+      "detail": "đã xoá dữ liệu test"
+    },
+    {
+      "id": "auth.logout",
+      "tier": "T2",
+      "feature": "POST /auth/logout",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "logout OK"
+    },
+    {
+      "id": "suite.bootstrap",
+      "tier": "T0",
+      "feature": "Khởi tạo suite",
+      "status": "FAIL",
+      "durationMs": 0,
+      "owner": "be",
+      "modelId": "deepseek-flash",
+      "errorMessage": "login: mong đợi HTTP 200/201 nhưng nhận 401 — {\"status\":\"error\",\"error_code\":\"Unauthorized\",\"error\":\"Invalid credentials\"}"
+    }
+  ],
+  "totals": {
+    "total": 35,
+    "pass": 32,
+    "fail": 1,
+    "skip": 2
+  }
+}

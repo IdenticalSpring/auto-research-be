@@ -1,0 +1,929 @@
+{
+  "generatedAt": "2026-11-01T17:18:28.408Z",
+  "durationMs": 520953,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "preflight",
+      "unit",
+      "http",
+      "kafka",
+      "live"
+    ],
+    "startedAt": 1793552987472
+  },
+  "cases": [
+    {
+      "id": "env.required",
+      "tier": "T0",
+      "feature": "Env bắt buộc có đủ",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "model=deepseek-flash, broker=kafka:29092"
+    },
+    {
+      "id": "env.model-whitelist",
+      "tier": "T0",
+      "feature": "Model mặc định thuộc whitelist",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "requested=selected=deepseek-flash"
+    },
+    {
+      "id": "prisma.validate",
+      "tier": "T0",
+      "feature": "Prisma schema hợp lệ",
+      "status": "PASS",
+      "durationMs": 1944,
+      "modelId": "deepseek-flash",
+      "detail": "prisma validate OK"
+    },
+    {
+      "id": "postgres.reachable",
+      "tier": "T0",
+      "feature": "Postgres reachable",
+      "status": "PASS",
+      "durationMs": 111,
+      "modelId": "deepseek-flash",
+      "detail": "20 bảng trong schema public"
+    },
+    {
+      "id": "prisma.migration-history",
+      "tier": "T0",
+      "feature": "Lịch sử migration",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "migrate status OK"
+    },
+    {
+      "id": "kafka.reachable",
+      "tier": "T0",
+      "feature": "Kafka reachable",
+      "status": "PASS",
+      "durationMs": 41,
+      "modelId": "deepseek-flash",
+      "detail": "19 topic"
+    },
+    {
+      "id": "ai-server.reachable",
+      "tier": "T0",
+      "feature": "AI server reachable",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "http://autoresearching-litellm:8000/v1"
+    },
+    {
+      "id": "unit.jest",
+      "tier": "T1",
+      "feature": "Toàn bộ unit/integration spec",
+      "status": "PASS",
+      "durationMs": 150715,
+      "modelId": "deepseek-flash",
+      "detail": "845 passed, 845 total"
+    },
+    {
+      "id": "auth.register-login",
+      "tier": "T2",
+      "feature": "Register/Login lấy JWT",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "email=e2e-1793553142075@e2e.local"
+    },
+    {
+      "id": "guard.documents",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /documents",
+      "status": "PASS",
+      "durationMs": 4,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.document-keywords",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /document-keywords",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.proposals",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /proposals",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.outlines",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /outlines",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.references",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /references",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.uploaded-documents",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /uploaded-documents",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.datasets",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /datasets",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.dataset-variables",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /dataset-variables",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.proposed-methods",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /proposed-methods",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.generated-slides",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /generated-slides",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.reports",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /reports",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.chat-sessions",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /chat-sessions",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.chat-messages",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /chat-messages",
+      "status": "PASS",
+      "durationMs": 1,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.enhancement-sessions",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /enhancement-sessions",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.enhancement-suggestions",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /enhancement-suggestions",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "guard.users",
+      "tier": "T2",
+      "feature": "401 khi thiếu JWT: GET /users",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 401"
+    },
+    {
+      "id": "documents.create",
+      "tier": "T2",
+      "feature": "POST /documents",
+      "status": "PASS",
+      "durationMs": 9,
+      "modelId": "deepseek-flash",
+      "detail": "id=d5ce6553-5d7b-48f5-a2a9-bd4c260f82c6"
+    },
+    {
+      "id": "documents.validation",
+      "tier": "T2",
+      "feature": "POST /documents numberOfDomains âm ⇒ 400",
+      "status": "PASS",
+      "durationMs": 4,
+      "modelId": "deepseek-flash",
+      "detail": "HTTP 400 (no message)"
+    },
+    {
+      "id": "documents.list",
+      "tier": "T2",
+      "feature": "GET /documents có bản ghi mới",
+      "status": "PASS",
+      "durationMs": 7,
+      "modelId": "deepseek-flash",
+      "detail": "1 document"
+    },
+    {
+      "id": "chat-session.model-sync",
+      "tier": "T2",
+      "feature": "ChatSession lưu đúng model cấu hình (B3)",
+      "status": "PASS",
+      "durationMs": 26,
+      "modelId": "deepseek-flash",
+      "detail": "model=deepseek-flash"
+    },
+    {
+      "id": "datasets.crud",
+      "tier": "T2",
+      "feature": "Dataset CRUD",
+      "status": "PASS",
+      "durationMs": 17,
+      "modelId": "deepseek-flash",
+      "detail": "create→update→delete OK (25328081-680b-4160-84bd-e286c9dfa540)"
+    },
+    {
+      "id": "health-check.status",
+      "tier": "T2",
+      "feature": "GET /health-check/:id",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "processStatus=1, eventType=unknown"
+    },
+    {
+      "id": "token-usage.summary",
+      "tier": "T2",
+      "feature": "GET /token-usage/user/:id",
+      "status": "PASS",
+      "durationMs": 3,
+      "modelId": "deepseek-flash",
+      "detail": "shape OK"
+    },
+    {
+      "id": "error.404-handling",
+      "tier": "T2",
+      "feature": "Route không tồn tại ⇒ 404 JSON",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "404 JSON chuẩn"
+    },
+    {
+      "id": "documents.cleanup",
+      "tier": "T2",
+      "feature": "DELETE /documents/:id",
+      "status": "PASS",
+      "durationMs": 8,
+      "modelId": "deepseek-flash",
+      "detail": "đã xoá dữ liệu test"
+    },
+    {
+      "id": "auth.logout",
+      "tier": "T2",
+      "feature": "POST /auth/logout",
+      "status": "PASS",
+      "durationMs": 2,
+      "modelId": "deepseek-flash",
+      "detail": "logout OK"
+    },
+    {
+      "id": "kafka.fake-ai-server",
+      "tier": "T3",
+      "feature": "Kết nối fake AI server + tạo probe topic",
+      "status": "PASS",
+      "durationMs": 66,
+      "modelId": "deepseek-flash",
+      "detail": "producer + consumer + probe topics ready"
+    },
+    {
+      "id": "jobs.document_setup",
+      "tier": "T3",
+      "feature": "jobs document_setup/generate_domains",
+      "status": "PASS",
+      "durationMs": 39,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "fbe71d64-e43a-458e-9ec3-f5df1afde5ec",
+      "detail": "status=finished, envelope OK, key=fbe71d64-e43a-458e-9ec3-f5df1afde5ec:generate_domains"
+    },
+    {
+      "id": "jobs.write_report",
+      "tier": "T3",
+      "feature": "jobs write_report/chuyen_de_2",
+      "status": "PASS",
+      "durationMs": 516,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "fbe71d64-e43a-458e-9ec3-f5df1afde5ec",
+      "detail": "status=finished, envelope OK, key=fbe71d64-e43a-458e-9ec3-f5df1afde5ec:chuyen_de_2"
+    },
+    {
+      "id": "jobs.chatbot",
+      "tier": "T3",
+      "feature": "jobs chatbot/outer_chatbot",
+      "status": "PASS",
+      "durationMs": 514,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "fbe71d64-e43a-458e-9ec3-f5df1afde5ec",
+      "detail": "status=finished, envelope OK, key=fbe71d64-e43a-458e-9ec3-f5df1afde5ec:outer_chatbot"
+    },
+    {
+      "id": "jobs.enhancement",
+      "tier": "T3",
+      "feature": "jobs enhancement/ai_in_doc",
+      "status": "PASS",
+      "durationMs": 512,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "fbe71d64-e43a-458e-9ec3-f5df1afde5ec",
+      "detail": "status=finished, envelope OK, key=fbe71d64-e43a-458e-9ec3-f5df1afde5ec:ai_in_doc"
+    },
+    {
+      "id": "jobs.error-mapping",
+      "tier": "T3",
+      "feature": "jobs enhancement/enhance",
+      "status": "PASS",
+      "durationMs": 513,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "fbe71d64-e43a-458e-9ec3-f5df1afde5ec",
+      "detail": "status=error, envelope OK, key=fbe71d64-e43a-458e-9ec3-f5df1afde5ec:enhance"
+    },
+    {
+      "id": "jobs.suspend",
+      "tier": "T3",
+      "feature": "jobs write_report/chuyen_de_3",
+      "status": "PASS",
+      "durationMs": 512,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "fbe71d64-e43a-458e-9ec3-f5df1afde5ec",
+      "detail": "status=suspended, envelope OK, key=fbe71d64-e43a-458e-9ec3-f5df1afde5ec:chuyen_de_3"
+    },
+    {
+      "id": "harness.early-response",
+      "tier": "T3",
+      "feature": "Response đến trước request (orphan store)",
+      "status": "PASS",
+      "durationMs": 803,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "detail": "lấy từ orphan trong 0ms"
+    },
+    {
+      "id": "harness.chunk-streaming",
+      "tier": "T3",
+      "feature": "Streaming chunk has_finished=false rồi true",
+      "status": "PASS",
+      "durationMs": 304,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "detail": "nhận 2 chunk rồi finished"
+    },
+    {
+      "id": "harness.api-error",
+      "tier": "T3",
+      "feature": "error_code từ response ⇒ fail-fast kèm mã lỗi",
+      "status": "PASS",
+      "durationMs": 302,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "detail": "reject đúng: AI Error 633: UnboundLocalError current_report"
+    },
+    {
+      "id": "live.search_papers",
+      "tier": "T4",
+      "feature": "search_papers (smoke)",
+      "status": "PASS",
+      "durationMs": 26182,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 360000,
+      "documentId": "e2e-live-1793553150183-search_papers",
+      "responseKey": "e2e-live-1793553150183-search_papers:search_papers",
+      "detail": "256 papers"
+    },
+    {
+      "id": "live.generate_outline",
+      "tier": "T4",
+      "feature": "generate_outline (core)",
+      "status": "PASS",
+      "durationMs": 11501,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 1800000,
+      "documentId": "e2e-live-1793553150183-generate_outline",
+      "responseKey": "e2e-live-1793553150183-generate_outline:generate_outline",
+      "detail": "outline OK"
+    },
+    {
+      "id": "live.generate_domains",
+      "tier": "T4",
+      "feature": "generate_domains (core)",
+      "status": "PASS",
+      "durationMs": 833,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793553150183-generate_domains",
+      "responseKey": "e2e-live-1793553150183-generate_domains:generate_domains",
+      "detail": "3 domains"
+    },
+    {
+      "id": "live.generate_titles",
+      "tier": "T4",
+      "feature": "generate_titles (core)",
+      "status": "PASS",
+      "durationMs": 85346,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793553150183-generate_titles",
+      "responseKey": "e2e-live-1793553150183-generate_titles:generate_titles",
+      "detail": "9 titles"
+    },
+    {
+      "id": "live.modify_outline",
+      "tier": "T4",
+      "feature": "modify_outline (core)",
+      "status": "PASS",
+      "durationMs": 25,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793553150183-modify_outline",
+      "responseKey": "e2e-live-1793553150183-modify_outline:modify_outline",
+      "detail": "outline OK"
+    },
+    {
+      "id": "live.get_journals",
+      "tier": "T4",
+      "feature": "get_journals (core)",
+      "status": "PASS",
+      "durationMs": 3890,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 1080000,
+      "documentId": "e2e-live-1793553150183-get_journals",
+      "responseKey": "e2e-live-1793553150183-get_journals:get_journals",
+      "detail": "response OK"
+    },
+    {
+      "id": "live.generate_subdomains",
+      "tier": "T4",
+      "feature": "generate_subdomains (core)",
+      "status": "PASS",
+      "durationMs": 875,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793553150183-generate_subdomains",
+      "responseKey": "e2e-live-1793553150183-generate_subdomains:generate_subdomains",
+      "detail": "3 subdomains"
+    },
+    {
+      "id": "live.generate_keywords",
+      "tier": "T4",
+      "feature": "generate_keywords (core)",
+      "status": "PASS",
+      "durationMs": 2599,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793553150183-generate_keywords",
+      "responseKey": "e2e-live-1793553150183-generate_keywords:generate_keywords",
+      "detail": "keywords object"
+    },
+    {
+      "id": "live.generate_title_description",
+      "tier": "T4",
+      "feature": "generate_title_description (core)",
+      "status": "PASS",
+      "durationMs": 9803,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793553150183-generate_title_description",
+      "responseKey": "e2e-live-1793553150183-generate_title_description:generate_title_description",
+      "detail": "title description OK"
+    },
+    {
+      "id": "live.generate_title_description_no_info",
+      "tier": "T4",
+      "feature": "generate_title_description_no_info (full)",
+      "status": "PASS",
+      "durationMs": 69380,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793553150183-generate_title_description_no_info",
+      "responseKey": "e2e-live-1793553150183-generate_title_description_no_info:generate_title_description_no_info",
+      "detail": "has field"
+    },
+    {
+      "id": "live.mix_titles",
+      "tier": "T4",
+      "feature": "mix_titles (full)",
+      "status": "PASS",
+      "durationMs": 24092,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793553150183-mix_titles",
+      "responseKey": "e2e-live-1793553150183-mix_titles:mix_titles",
+      "detail": "title=Tác động của bán hàng qua mạng xã hội đế"
+    },
+    {
+      "id": "live.get_research_type",
+      "tier": "T4",
+      "feature": "get_research_type (full)",
+      "status": "PASS",
+      "durationMs": 3680,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793553150183-get_research_type",
+      "responseKey": "e2e-live-1793553150183-get_research_type:get_research_type",
+      "detail": "research_type={\"type\":1,\"reason\":\"Đề tài của bạn phù h"
+    },
+    {
+      "id": "live.generate_outline_with_refs",
+      "tier": "T4",
+      "feature": "generate_outline_with_refs (full)",
+      "status": "PASS",
+      "durationMs": 13338,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793553150183-generate_outline_with_refs",
+      "responseKey": "e2e-live-1793553150183-generate_outline_with_refs:generate_outline_with_refs",
+      "detail": "outline with refs OK"
+    },
+    {
+      "id": "live.update_user_refs",
+      "tier": "T4",
+      "feature": "update_user_refs (full)",
+      "status": "PASS",
+      "durationMs": 15518,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793553150183-update_user_refs",
+      "responseKey": "e2e-live-1793553150183-update_user_refs:update_user_refs",
+      "detail": "update refs OK"
+    },
+    {
+      "id": "live.user_documents",
+      "tier": "T4",
+      "feature": "user_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "Cần hạ tầng AI: chạy `npm run e2e:seed-infra` rồi `E2E_WITH_INFRA=1` (dùng reports/infra-fixtures.json)"
+    },
+    {
+      "id": "live.embed_user_documents",
+      "tier": "T4",
+      "feature": "embed_user_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "Cần hạ tầng AI: chạy `npm run e2e:seed-infra` rồi `E2E_WITH_INFRA=1` (dùng reports/infra-fixtures.json)"
+    },
+    {
+      "id": "live.search_user_documents",
+      "tier": "T4",
+      "feature": "search_user_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "Cần hạ tầng AI: chạy `npm run e2e:seed-infra` rồi `E2E_WITH_INFRA=1` (dùng reports/infra-fixtures.json)"
+    },
+    {
+      "id": "live.delete_documents",
+      "tier": "T4",
+      "feature": "delete_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "Cần hạ tầng AI: chạy `npm run e2e:seed-infra` rồi `E2E_WITH_INFRA=1` (dùng reports/infra-fixtures.json)"
+    },
+    {
+      "id": "live.admin_documents",
+      "tier": "T4",
+      "feature": "admin_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "Cần hạ tầng AI: chạy `npm run e2e:seed-infra` rồi `E2E_WITH_INFRA=1` (dùng reports/infra-fixtures.json)"
+    },
+    {
+      "id": "live.user_guide_documents",
+      "tier": "T4",
+      "feature": "user_guide_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "Cần hạ tầng AI: chạy `npm run e2e:seed-infra` rồi `E2E_WITH_INFRA=1` (dùng reports/infra-fixtures.json)"
+    },
+    {
+      "id": "live.analyzer",
+      "tier": "T4",
+      "feature": "analyzer (core)",
+      "status": "PASS",
+      "durationMs": 13297,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793553150183-analyzer",
+      "responseKey": "e2e-live-1793553150183-analyzer:analyzer",
+      "detail": "analyzer finished"
+    },
+    {
+      "id": "live.chuyen_de_2",
+      "tier": "T4",
+      "feature": "chuyen_de_2 (smoke)",
+      "status": "PASS",
+      "durationMs": 8990,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 2160000,
+      "documentId": "e2e-live-1793553150183-chuyen_de_2",
+      "responseKey": "e2e-live-1793553150183-chuyen_de_2:chuyen_de_2",
+      "detail": "section=chapter_1"
+    },
+    {
+      "id": "live.write_content",
+      "tier": "T4",
+      "feature": "write_content (core)",
+      "status": "PASS",
+      "durationMs": 2375,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 2160000,
+      "documentId": "e2e-live-1793553150183-write_content",
+      "responseKey": "e2e-live-1793553150183-write_content:write_content",
+      "detail": "write_content finished"
+    },
+    {
+      "id": "live.comment_data",
+      "tier": "T4",
+      "feature": "comment_data (core)",
+      "status": "PASS",
+      "durationMs": 3713,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793553150183-comment_data",
+      "responseKey": "e2e-live-1793553150183-comment_data:comment_data",
+      "detail": "comment finished"
+    },
+    {
+      "id": "live.propose_method",
+      "tier": "T4",
+      "feature": "propose_method (core)",
+      "status": "PASS",
+      "durationMs": 6543,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793553150183-propose_method",
+      "responseKey": "e2e-live-1793553150183-propose_method:propose_method",
+      "detail": "SUSPENDED: AI yêu cầu user_input (Tôi sẽ phân tích bối cảnh nghiên cứu và (các) bài báo được cung cấp, sau đó đề xuất lự"
+    },
+    {
+      "id": "live.gen_slides",
+      "tier": "T4",
+      "feature": "gen_slides (full)",
+      "status": "PASS",
+      "durationMs": 253,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793553150183-gen_slides",
+      "responseKey": "e2e-live-1793553150183-gen_slides:gen_slides",
+      "detail": "gen_slides OK"
+    },
+    {
+      "id": "live.chuyen_de_1",
+      "tier": "T4",
+      "feature": "chuyen_de_1 (core)",
+      "status": "PASS",
+      "durationMs": 2770,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 2160000,
+      "documentId": "e2e-live-1793553150183-chuyen_de_1",
+      "responseKey": "e2e-live-1793553150183-chuyen_de_1:chuyen_de_1",
+      "detail": "chuyen_de_1 finished"
+    },
+    {
+      "id": "live.chuyen_de_3",
+      "tier": "T4",
+      "feature": "chuyen_de_3 (core)",
+      "status": "PASS",
+      "durationMs": 14297,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 2160000,
+      "documentId": "e2e-live-1793553150183-chuyen_de_3",
+      "responseKey": "e2e-live-1793553150183-chuyen_de_3:chuyen_de_3",
+      "detail": "chuyen_de_3 finished"
+    },
+    {
+      "id": "live.analyzer_tool",
+      "tier": "T4",
+      "feature": "analyzer_tool (full)",
+      "status": "PASS",
+      "durationMs": 9537,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793553150183-analyzer_tool",
+      "responseKey": "e2e-live-1793553150183-analyzer_tool:analyzer_tool",
+      "detail": "analyzer_tool finished"
+    },
+    {
+      "id": "live.check_logic_data",
+      "tier": "T4",
+      "feature": "check_logic_data (full)",
+      "status": "PASS",
+      "durationMs": 31,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 360000,
+      "documentId": "e2e-live-1793553150183-check_logic_data",
+      "responseKey": "e2e-live-1793553150183-check_logic_data:check_logic_data",
+      "detail": "check_logic_data finished"
+    },
+    {
+      "id": "live.parsed_value",
+      "tier": "T4",
+      "feature": "parsed_value (full)",
+      "status": "PASS",
+      "durationMs": 2869,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793553150183-parsed_value",
+      "responseKey": "e2e-live-1793553150183-parsed_value:parsed_value",
+      "detail": "parsed_value OK"
+    },
+    {
+      "id": "live.edit_report",
+      "tier": "T4",
+      "feature": "edit_report (core)",
+      "status": "PASS",
+      "durationMs": 1186,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793553150183-edit_report",
+      "responseKey": "e2e-live-1793553150183-edit_report:edit_report",
+      "detail": "## 1.1 Tính cấp thiết của đề tài\n\nChuyển đổi số đang từng bư"
+    },
+    {
+      "id": "live.translate_report",
+      "tier": "T4",
+      "feature": "translate_report (core)",
+      "status": "PASS",
+      "durationMs": 1544,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793553150183-translate_report",
+      "responseKey": "e2e-live-1793553150183-translate_report:translate_report",
+      "detail": "translate_report OK"
+    },
+    {
+      "id": "live.delete_report",
+      "tier": "T4",
+      "feature": "delete_report (full)",
+      "status": "PASS",
+      "durationMs": 903,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793553150183-delete_report",
+      "responseKey": "e2e-live-1793553150183-delete_report:delete_report",
+      "detail": "delete_report OK"
+    },
+    {
+      "id": "live.enhance_all",
+      "tier": "T4",
+      "feature": "enhance_all (full)",
+      "status": "PASS",
+      "durationMs": 2541,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 288000,
+      "documentId": "e2e-live-1793553150183-enhance_all",
+      "responseKey": "e2e-live-1793553150183-enhance_all:enhance_all",
+      "detail": "1 paragraphs"
+    },
+    {
+      "id": "live.outer_chatbot",
+      "tier": "T4",
+      "feature": "outer_chatbot (core)",
+      "status": "PASS",
+      "durationMs": 2776,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 288000,
+      "documentId": "e2e-live-1793553150183-outer_chatbot",
+      "responseKey": "e2e-live-1793553150183-outer_chatbot:outer_chatbot",
+      "detail": "Chuyển đổi số là quá trình tích hợp công nghệ số vào mọi hoạ"
+    },
+    {
+      "id": "live.ai_in_doc",
+      "tier": "T4",
+      "feature": "ai_in_doc (smoke)",
+      "status": "PASS",
+      "durationMs": 1065,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 288000,
+      "documentId": "e2e-live-1793553150183-ai_in_doc",
+      "responseKey": "e2e-live-1793553150183-ai_in_doc:ai_in_doc",
+      "detail": "Chuyển đổi số giúp nâng cao năng suất và giảm thiểu chi phí "
+    },
+    {
+      "id": "live.inner_chatbot",
+      "tier": "T4",
+      "feature": "inner_chatbot (core)",
+      "status": "PASS",
+      "durationMs": 1863,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 288000,
+      "documentId": "e2e-live-1793553150183-inner_chatbot",
+      "responseKey": "e2e-live-1793553150183-inner_chatbot:inner_chatbot",
+      "detail": "Tôi chưa nhận được tài liệu nào từ bạn để tóm tắt. Vui lòng "
+    },
+    {
+      "id": "live.get_suggestions",
+      "tier": "T4",
+      "feature": "get_suggestions (core)",
+      "status": "PASS",
+      "durationMs": 657,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 288000,
+      "documentId": "e2e-live-1793553150183-get_suggestions",
+      "responseKey": "e2e-live-1793553150183-get_suggestions:get_suggestions",
+      "detail": "OK"
+    },
+    {
+      "id": "live.writer",
+      "tier": "T4",
+      "feature": "writer (full)",
+      "status": "PASS",
+      "durationMs": 2100,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 2160000,
+      "documentId": "e2e-live-1793553150183-writer",
+      "responseKey": "e2e-live-1793553150183-writer:writer",
+      "detail": "writer OK"
+    },
+    {
+      "id": "live.writer_chatbot",
+      "tier": "T4",
+      "feature": "writer_chatbot (full)",
+      "status": "PASS",
+      "durationMs": 6009,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 288000,
+      "documentId": "e2e-live-1793553150183-writer_chatbot",
+      "responseKey": "e2e-live-1793553150183-writer_chatbot:writer_chatbot",
+      "detail": "SUSPENDED: AI yêu cầu user_input (Hiện tại bạn chưa cung cấp thông tin cụ thể về đề tài nghiên cứu, câu hỏi nghiên cứu, "
+    },
+    {
+      "id": "live.enhance",
+      "tier": "T4",
+      "feature": "enhance (full)",
+      "status": "PASS",
+      "durationMs": 5727,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 288000,
+      "documentId": "e2e-live-1793553150183-enhance",
+      "responseKey": "e2e-live-1793553150183-enhance:enhance",
+      "detail": "enhance OK"
+    }
+  ],
+  "totals": {
+    "total": 87,
+    "pass": 81,
+    "fail": 0,
+    "skip": 6
+  }
+}

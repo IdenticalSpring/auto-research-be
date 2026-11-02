@@ -1,0 +1,73 @@
+{
+  "generatedAt": "2026-11-01T15:58:04.058Z",
+  "durationMs": 3,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793548684055
+  },
+  "cases": [
+    {
+      "id": "live.user_documents",
+      "tier": "T4",
+      "feature": "user_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "dry-run topic=document_setup_request key=e2e-live-user-documents-e70459:user_documents timeout=4320s model=deepseek-flash"
+    },
+    {
+      "id": "live.embed_user_documents",
+      "tier": "T4",
+      "feature": "embed_user_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "dry-run topic=document_setup_request key=e2e-live-user-documents-e70459:embed_user_documents timeout=4320s model=deepseek-flash"
+    },
+    {
+      "id": "live.search_user_documents",
+      "tier": "T4",
+      "feature": "search_user_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "dry-run topic=document_setup_request key=e2e-live-user-documents-e70459:search_user_documents timeout=240s model=deepseek-flash"
+    },
+    {
+      "id": "live.delete_documents",
+      "tier": "T4",
+      "feature": "delete_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "dry-run topic=document_setup_request key=e2e-live-user-documents-e70459:delete_documents timeout=240s model=deepseek-flash"
+    },
+    {
+      "id": "live.admin_documents",
+      "tier": "T4",
+      "feature": "admin_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "dry-run topic=document_setup_request key=e2e-live-user-documents-e70459:admin_documents timeout=4320s model=deepseek-flash"
+    },
+    {
+      "id": "live.user_guide_documents",
+      "tier": "T4",
+      "feature": "user_guide_documents (full)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "dry-run topic=document_setup_request key=e2e-live-user-documents-e70459:user_guide_documents timeout=4320s model=deepseek-flash"
+    }
+  ],
+  "totals": {
+    "total": 6,
+    "pass": 0,
+    "fail": 0,
+    "skip": 6
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2026-11-01T10:10:05.768Z",
+  "durationMs": 57,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "kafka"
+    ],
+    "startedAt": 1793527805712
+  },
+  "cases": [
+    {
+      "id": "suite.bootstrap",
+      "tier": "T0",
+      "feature": "Khởi tạo suite",
+      "status": "FAIL",
+      "durationMs": 0,
+      "owner": "be",
+      "modelId": "deepseek-flash",
+      "errorMessage": "login: HTTP 401 — {\"status\":\"error\",\"error_code\":\"Unauthorized\",\"error\":\"Invalid credentials\"} (email=e2e-kafka-1793527805713@e2e.local)"
+    }
+  ],
+  "totals": {
+    "total": 1,
+    "pass": 0,
+    "fail": 1,
+    "skip": 0
+  }
+}

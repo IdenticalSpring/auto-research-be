@@ -1,0 +1,87 @@
+{
+  "generatedAt": "2026-11-01T13:00:05.419Z",
+  "durationMs": 3821,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "preflight"
+    ],
+    "startedAt": 1793538001598
+  },
+  "cases": [
+    {
+      "id": "env.required",
+      "tier": "T0",
+      "feature": "Env bắt buộc có đủ",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "model=deepseek-flash, broker=kafka:29092"
+    },
+    {
+      "id": "env.model-whitelist",
+      "tier": "T0",
+      "feature": "Model mặc định thuộc whitelist",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "requested=selected=deepseek-flash"
+    },
+    {
+      "id": "prisma.validate",
+      "tier": "T0",
+      "feature": "Prisma schema hợp lệ",
+      "status": "PASS",
+      "durationMs": 1859,
+      "modelId": "deepseek-flash",
+      "detail": "prisma validate OK"
+    },
+    {
+      "id": "postgres.reachable",
+      "tier": "T0",
+      "feature": "Postgres reachable",
+      "status": "PASS",
+      "durationMs": 105,
+      "modelId": "deepseek-flash",
+      "detail": "20 bảng trong schema public"
+    },
+    {
+      "id": "prisma.migration-history",
+      "tier": "T0",
+      "feature": "Lịch sử migration",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "migrate status OK"
+    },
+    {
+      "id": "kafka.reachable",
+      "tier": "T0",
+      "feature": "Kafka reachable",
+      "status": "PASS",
+      "durationMs": 86,
+      "modelId": "deepseek-flash",
+      "detail": "19 topic"
+    },
+    {
+      "id": "ai-server.reachable",
+      "tier": "T0",
+      "feature": "AI server reachable",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "bỏ qua vì không chạy tier live"
+    }
+  ],
+  "totals": {
+    "total": 7,
+    "pass": 6,
+    "fail": 0,
+    "skip": 1
+  }
+}

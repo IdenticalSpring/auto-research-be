@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-11-01T14:58:36.143Z",
+  "durationMs": 11568,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793545104575
+  },
+  "cases": [
+    {
+      "id": "live.generate_outline",
+      "tier": "T4",
+      "feature": "generate_outline (core)",
+      "status": "PASS",
+      "durationMs": 10472,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 1800000,
+      "documentId": "e2e-live-1793545104575-generate_outline",
+      "responseKey": "e2e-live-1793545104575-generate_outline:generate_outline",
+      "detail": "outline OK"
+    },
+    {
+      "id": "live.modify_outline",
+      "tier": "T4",
+      "feature": "modify_outline (core)",
+      "status": "PASS",
+      "durationMs": 1027,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793545104575-modify_outline",
+      "responseKey": "e2e-live-1793545104575-modify_outline:modify_outline",
+      "detail": "outline OK"
+    }
+  ],
+  "totals": {
+    "total": 2,
+    "pass": 2,
+    "fail": 0,
+    "skip": 0
+  }
+}

@@ -1,0 +1,100 @@
+{
+  "generatedAt": "2026-11-01T10:34:36.447Z",
+  "durationMs": 282778,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793528993670
+  },
+  "cases": [
+    {
+      "id": "live.search_papers",
+      "tier": "T4",
+      "feature": "search_papers (smoke)",
+      "status": "PASS",
+      "durationMs": 27637,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793528993670-search_papers",
+      "responseKey": "e2e-live-1793528993670-search_papers:search_papers",
+      "detail": "185 papers"
+    },
+    {
+      "id": "live.generate_outline",
+      "tier": "T4",
+      "feature": "generate_outline (smoke)",
+      "status": "FAIL",
+      "durationMs": 25,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793528993670-generate_outline",
+      "responseKey": "e2e-live-1793528993670-generate_outline:generate_outline",
+      "errorMessage": "AI Error 603: Missing field ''word_count_str''"
+    },
+    {
+      "id": "live.analyzer",
+      "tier": "T4",
+      "feature": "analyzer (smoke)",
+      "status": "FAIL",
+      "durationMs": 7512,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 360000,
+      "documentId": "e2e-live-1793528993670-analyzer",
+      "responseKey": "e2e-live-1793528993670-analyzer:analyzer",
+      "errorMessage": "AI Error 631: 'final_report'"
+    },
+    {
+      "id": "live.chuyen_de_2",
+      "tier": "T4",
+      "feature": "chuyen_de_2 (smoke)",
+      "status": "PASS",
+      "durationMs": 6145,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 1800000,
+      "documentId": "e2e-live-1793528993670-chuyen_de_2",
+      "responseKey": "e2e-live-1793528993670-chuyen_de_2:chuyen_de_2",
+      "detail": "section=chapter_1"
+    },
+    {
+      "id": "live.outer_chatbot",
+      "tier": "T4",
+      "feature": "outer_chatbot (smoke)",
+      "status": "FAIL",
+      "durationMs": 240000,
+      "owner": "be",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793528993670-outer_chatbot",
+      "responseKey": "e2e-live-1793528993670-outer_chatbot:outer_chatbot",
+      "errorMessage": "Timeout sau 4 phút không nhận thêm response (event=outer_chatbot, doc=, session=sess-e2e-live-1793528993670-outer_chatbot, model=deepseek-flash, chunks=0)"
+    },
+    {
+      "id": "live.ai_in_doc",
+      "tier": "T4",
+      "feature": "ai_in_doc (smoke)",
+      "status": "PASS",
+      "durationMs": 1406,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793528993670-ai_in_doc",
+      "responseKey": "e2e-live-1793528993670-ai_in_doc:ai_in_doc",
+      "detail": "Chuyển đổi số giúp nâng cao năng suất và giảm thiểu chi phí "
+    }
+  ],
+  "totals": {
+    "total": 6,
+    "pass": 3,
+    "fail": 3,
+    "skip": 0
+  }
+}

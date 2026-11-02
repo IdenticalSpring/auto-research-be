@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-11-01T14:20:41.437Z",
+  "durationMs": 58279,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793542783158
+  },
+  "cases": [
+    {
+      "id": "live.chuyen_de_1",
+      "tier": "T4",
+      "feature": "chuyen_de_1 (core)",
+      "status": "PASS",
+      "durationMs": 30635,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 1800000,
+      "documentId": "e2e-live-1793542783159-chuyen_de_1",
+      "responseKey": "e2e-live-1793542783159-chuyen_de_1:chuyen_de_1",
+      "detail": "chuyen_de_1 finished"
+    },
+    {
+      "id": "live.chuyen_de_3",
+      "tier": "T4",
+      "feature": "chuyen_de_3 (core)",
+      "status": "PASS",
+      "durationMs": 27592,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 1800000,
+      "documentId": "e2e-live-1793542783159-chuyen_de_3",
+      "responseKey": "e2e-live-1793542783159-chuyen_de_3:chuyen_de_3",
+      "detail": "chuyen_de_3 finished"
+    }
+  ],
+  "totals": {
+    "total": 2,
+    "pass": 2,
+    "fail": 0,
+    "skip": 0
+  }
+}

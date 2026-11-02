@@ -1,0 +1,193 @@
+{
+  "generatedAt": "2026-11-01T13:50:48.778Z",
+  "durationMs": 10818,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "preflight",
+      "kafka"
+    ],
+    "startedAt": 1793541037961
+  },
+  "cases": [
+    {
+      "id": "env.required",
+      "tier": "T0",
+      "feature": "Env bắt buộc có đủ",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "model=deepseek-flash, broker=kafka:29092"
+    },
+    {
+      "id": "env.model-whitelist",
+      "tier": "T0",
+      "feature": "Model mặc định thuộc whitelist",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "requested=selected=deepseek-flash"
+    },
+    {
+      "id": "prisma.validate",
+      "tier": "T0",
+      "feature": "Prisma schema hợp lệ",
+      "status": "PASS",
+      "durationMs": 2308,
+      "modelId": "deepseek-flash",
+      "detail": "prisma validate OK"
+    },
+    {
+      "id": "postgres.reachable",
+      "tier": "T0",
+      "feature": "Postgres reachable",
+      "status": "PASS",
+      "durationMs": 89,
+      "modelId": "deepseek-flash",
+      "detail": "20 bảng trong schema public"
+    },
+    {
+      "id": "prisma.migration-history",
+      "tier": "T0",
+      "feature": "Lịch sử migration",
+      "status": "PASS",
+      "durationMs": 0,
+      "modelId": "deepseek-flash",
+      "detail": "migrate status OK"
+    },
+    {
+      "id": "kafka.reachable",
+      "tier": "T0",
+      "feature": "Kafka reachable",
+      "status": "PASS",
+      "durationMs": 40,
+      "modelId": "deepseek-flash",
+      "detail": "19 topic"
+    },
+    {
+      "id": "ai-server.reachable",
+      "tier": "T0",
+      "feature": "AI server reachable",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "bỏ qua vì không chạy tier live"
+    },
+    {
+      "id": "kafka.fake-ai-server",
+      "tier": "T3",
+      "feature": "Kết nối fake AI server + tạo probe topic",
+      "status": "PASS",
+      "durationMs": 69,
+      "modelId": "deepseek-flash",
+      "detail": "producer + consumer + probe topics ready"
+    },
+    {
+      "id": "jobs.document_setup",
+      "tier": "T3",
+      "feature": "jobs document_setup/generate_domains",
+      "status": "PASS",
+      "durationMs": 54,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "29e567b7-86c3-498b-bab9-c2b97929d63c",
+      "detail": "status=finished, envelope OK, key=29e567b7-86c3-498b-bab9-c2b97929d63c:generate_domains"
+    },
+    {
+      "id": "jobs.write_report",
+      "tier": "T3",
+      "feature": "jobs write_report/chuyen_de_2",
+      "status": "PASS",
+      "durationMs": 15,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "29e567b7-86c3-498b-bab9-c2b97929d63c",
+      "detail": "status=finished, envelope OK, key=29e567b7-86c3-498b-bab9-c2b97929d63c:chuyen_de_2"
+    },
+    {
+      "id": "jobs.chatbot",
+      "tier": "T3",
+      "feature": "jobs chatbot/outer_chatbot",
+      "status": "PASS",
+      "durationMs": 518,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "29e567b7-86c3-498b-bab9-c2b97929d63c",
+      "detail": "status=finished, envelope OK, key=29e567b7-86c3-498b-bab9-c2b97929d63c:outer_chatbot"
+    },
+    {
+      "id": "jobs.enhancement",
+      "tier": "T3",
+      "feature": "jobs enhancement/ai_in_doc",
+      "status": "PASS",
+      "durationMs": 517,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "29e567b7-86c3-498b-bab9-c2b97929d63c",
+      "detail": "status=finished, envelope OK, key=29e567b7-86c3-498b-bab9-c2b97929d63c:ai_in_doc"
+    },
+    {
+      "id": "jobs.error-mapping",
+      "tier": "T3",
+      "feature": "jobs enhancement/enhance",
+      "status": "PASS",
+      "durationMs": 15,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "29e567b7-86c3-498b-bab9-c2b97929d63c",
+      "detail": "status=error, envelope OK, key=29e567b7-86c3-498b-bab9-c2b97929d63c:enhance"
+    },
+    {
+      "id": "jobs.suspend",
+      "tier": "T3",
+      "feature": "jobs write_report/chuyen_de_3",
+      "status": "PASS",
+      "durationMs": 513,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 20000,
+      "documentId": "29e567b7-86c3-498b-bab9-c2b97929d63c",
+      "detail": "status=suspended, envelope OK, key=29e567b7-86c3-498b-bab9-c2b97929d63c:chuyen_de_3"
+    },
+    {
+      "id": "harness.early-response",
+      "tier": "T3",
+      "feature": "Response đến trước request (orphan store)",
+      "status": "PASS",
+      "durationMs": 803,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "detail": "lấy từ orphan trong 1ms"
+    },
+    {
+      "id": "harness.chunk-streaming",
+      "tier": "T3",
+      "feature": "Streaming chunk has_finished=false rồi true",
+      "status": "PASS",
+      "durationMs": 304,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "detail": "nhận 2 chunk rồi finished"
+    },
+    {
+      "id": "harness.api-error",
+      "tier": "T3",
+      "feature": "error_code từ response ⇒ fail-fast kèm mã lỗi",
+      "status": "PASS",
+      "durationMs": 310,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 15000,
+      "detail": "reject đúng: AI Error 633: UnboundLocalError current_report"
+    }
+  ],
+  "totals": {
+    "total": 17,
+    "pass": 16,
+    "fail": 0,
+    "skip": 1
+  }
+}

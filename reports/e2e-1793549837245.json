@@ -1,0 +1,136 @@
+{
+  "generatedAt": "2026-11-01T16:17:17.245Z",
+  "durationMs": 50189,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793549787057
+  },
+  "cases": [
+    {
+      "id": "live.generate_outline_with_refs",
+      "tier": "T4",
+      "feature": "generate_outline_with_refs (full)",
+      "status": "PASS",
+      "durationMs": 12384,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793549787058-generate_outline_with_refs",
+      "responseKey": "e2e-live-1793549787058-generate_outline_with_refs:generate_outline_with_refs",
+      "detail": "outline with refs OK"
+    },
+    {
+      "id": "live.update_user_refs",
+      "tier": "T4",
+      "feature": "update_user_refs (full)",
+      "status": "PASS",
+      "durationMs": 20249,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793549787058-update_user_refs",
+      "responseKey": "e2e-live-1793549787058-update_user_refs:update_user_refs",
+      "detail": "update refs OK"
+    },
+    {
+      "id": "live.search_user_documents",
+      "tier": "T4",
+      "feature": "search_user_documents (full)",
+      "status": "PASS",
+      "durationMs": 3880,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-user-documents-e70459",
+      "responseKey": "e2e-live-user-documents-e70459:search_user_documents",
+      "detail": "search_user_documents OK"
+    },
+    {
+      "id": "live.gen_slides",
+      "tier": "T4",
+      "feature": "gen_slides (full)",
+      "status": "PASS",
+      "durationMs": 186,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 504000,
+      "documentId": "e2e-live-1793549787058-gen_slides",
+      "responseKey": "e2e-live-1793549787058-gen_slides:gen_slides",
+      "detail": "gen_slides OK"
+    },
+    {
+      "id": "live.delete_report",
+      "tier": "T4",
+      "feature": "delete_report (full)",
+      "status": "FAIL",
+      "durationMs": 1446,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793549787058-delete_report",
+      "responseKey": "e2e-live-1793549787058-delete_report:delete_report",
+      "errorMessage": "AI Error 603: document_id must be a list"
+    },
+    {
+      "id": "live.enhance_all",
+      "tier": "T4",
+      "feature": "enhance_all (full)",
+      "status": "PASS",
+      "durationMs": 2362,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 288000,
+      "documentId": "e2e-live-1793549787058-enhance_all",
+      "responseKey": "e2e-live-1793549787058-enhance_all:enhance_all",
+      "detail": "1 paragraphs"
+    },
+    {
+      "id": "live.writer",
+      "tier": "T4",
+      "feature": "writer (full)",
+      "status": "FAIL",
+      "durationMs": 3372,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 2160000,
+      "documentId": "e2e-live-1793549787058-writer",
+      "responseKey": "e2e-live-1793549787058-writer:writer",
+      "errorMessage": "AI Error 653: 'code'"
+    },
+    {
+      "id": "live.writer_chatbot",
+      "tier": "T4",
+      "feature": "writer_chatbot (full)",
+      "status": "PASS",
+      "durationMs": 6215,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 288000,
+      "documentId": "e2e-live-1793549787058-writer_chatbot",
+      "responseKey": "e2e-live-1793549787058-writer_chatbot:writer_chatbot",
+      "detail": "SUSPENDED: AI yêu cầu user_input (Hiện tại bạn chưa cung cấp thông tin cụ thể nào về đề tài nghiên cứu, câu hỏi nghiên c"
+    },
+    {
+      "id": "live.enhance",
+      "tier": "T4",
+      "feature": "enhance (full)",
+      "status": "FAIL",
+      "durationMs": 19,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 288000,
+      "documentId": "e2e-live-1793549787058-enhance",
+      "responseKey": "e2e-live-1793549787058-enhance:enhance",
+      "errorMessage": "AI Error 603: Missing field ''suggested_paragraph''"
+    }
+  ],
+  "totals": {
+    "total": 9,
+    "pass": 6,
+    "fail": 3,
+    "skip": 0
+  }
+}

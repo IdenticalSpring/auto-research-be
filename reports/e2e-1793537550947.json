@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-11-01T12:52:30.947Z",
+  "durationMs": 99,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793537550848
+  },
+  "cases": [
+    {
+      "id": "live.propose_method",
+      "tier": "T4",
+      "feature": "propose_method (core)",
+      "status": "FAIL",
+      "durationMs": 36,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 60000,
+      "documentId": "e2e-live-1793537550849-propose_method",
+      "responseKey": "e2e-live-1793537550849-propose_method:propose_method",
+      "errorMessage": "AI Error 637: 'NoneType' object is not subscriptable"
+    }
+  ],
+  "totals": {
+    "total": 1,
+    "pass": 0,
+    "fail": 1,
+    "skip": 0
+  }
+}

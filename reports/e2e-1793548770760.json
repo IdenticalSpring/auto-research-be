@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-11-01T15:59:30.760Z",
+  "durationMs": 316,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793548770444
+  },
+  "cases": [
+    {
+      "id": "live.search_user_documents",
+      "tier": "T4",
+      "feature": "search_user_documents (full)",
+      "status": "FAIL",
+      "durationMs": 259,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-user-documents-e70459",
+      "responseKey": "e2e-live-user-documents-e70459:search_user_documents",
+      "errorMessage": "AI Error 625: 'outline_id'"
+    }
+  ],
+  "totals": {
+    "total": 1,
+    "pass": 0,
+    "fail": 1,
+    "skip": 0
+  }
+}

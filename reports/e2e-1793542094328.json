@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-11-01T14:08:14.328Z",
+  "durationMs": 6949,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793542087379
+  },
+  "cases": [
+    {
+      "id": "live.propose_method",
+      "tier": "T4",
+      "feature": "propose_method (core)",
+      "status": "PASS",
+      "durationMs": 5898,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 360000,
+      "documentId": "e2e-live-1793542087380-propose_method",
+      "responseKey": "e2e-live-1793542087380-propose_method:propose_method",
+      "detail": "SUSPENDED: AI yêu cầu user_input (Tôi sẽ đề xuất lựa chọn và phân tích tài liệu tham khảo cho mô hình nghiên cứu của bạn"
+    }
+  ],
+  "totals": {
+    "total": 1,
+    "pass": 1,
+    "fail": 0,
+    "skip": 0
+  }
+}

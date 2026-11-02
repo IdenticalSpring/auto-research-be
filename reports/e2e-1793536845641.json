@@ -1,0 +1,98 @@
+{
+  "generatedAt": "2026-11-01T12:40:45.641Z",
+  "durationMs": 275047,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793536570594
+  },
+  "cases": [
+    {
+      "id": "live.search_papers",
+      "tier": "T4",
+      "feature": "search_papers (smoke)",
+      "status": "PASS",
+      "durationMs": 12890,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793536570595-search_papers",
+      "responseKey": "e2e-live-1793536570595-search_papers:search_papers",
+      "detail": "109 papers"
+    },
+    {
+      "id": "live.analyzer",
+      "tier": "T4",
+      "feature": "analyzer (core)",
+      "status": "PASS",
+      "durationMs": 11426,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 360000,
+      "documentId": "e2e-live-1793536570595-analyzer",
+      "responseKey": "e2e-live-1793536570595-analyzer:analyzer",
+      "detail": "analyzer finished"
+    },
+    {
+      "id": "live.chuyen_de_2",
+      "tier": "T4",
+      "feature": "chuyen_de_2 (smoke)",
+      "status": "PASS",
+      "durationMs": 7668,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 1800000,
+      "documentId": "e2e-live-1793536570595-chuyen_de_2",
+      "responseKey": "e2e-live-1793536570595-chuyen_de_2:chuyen_de_2",
+      "detail": "section=chapter_1"
+    },
+    {
+      "id": "live.outer_chatbot",
+      "tier": "T4",
+      "feature": "outer_chatbot (core)",
+      "status": "PASS",
+      "durationMs": 1533,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793536570595-outer_chatbot",
+      "responseKey": "e2e-live-1793536570595-outer_chatbot:outer_chatbot",
+      "detail": "Chuyển đổi số là quá trình ứng dụng công nghệ số để thay đổi"
+    },
+    {
+      "id": "live.ai_in_doc",
+      "tier": "T4",
+      "feature": "ai_in_doc (smoke)",
+      "status": "PASS",
+      "durationMs": 1186,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793536570595-ai_in_doc",
+      "responseKey": "e2e-live-1793536570595-ai_in_doc:ai_in_doc",
+      "detail": "Chuyển đổi số giúp nâng cao năng suất và giảm thiểu chi phí "
+    },
+    {
+      "id": "live.inner_chatbot",
+      "tier": "T4",
+      "feature": "inner_chatbot (core)",
+      "status": "FAIL",
+      "durationMs": 240000,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793536570595-inner_chatbot",
+      "responseKey": "e2e-live-1793536570595-inner_chatbot:inner_chatbot",
+      "errorMessage": "Timeout sau 4 phút không nhận thêm response (event=inner_chatbot, doc=, session=sess-e2e-live-1793536570595-inner_chatbot, model=deepseek-flash, chunks=0)"
+    }
+  ],
+  "totals": {
+    "total": 6,
+    "pass": 5,
+    "fail": 1,
+    "skip": 0
+  }
+}

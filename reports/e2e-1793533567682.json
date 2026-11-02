@@ -1,0 +1,139 @@
+{
+  "generatedAt": "2026-11-01T11:46:07.682Z",
+  "durationMs": 12454,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793533555229
+  },
+  "cases": [
+    {
+      "id": "live.generate_outline",
+      "tier": "T4",
+      "feature": "generate_outline (core)",
+      "status": "FAIL",
+      "durationMs": 37,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793533555229-generate_outline",
+      "responseKey": "e2e-live-1793533555229-generate_outline:generate_outline",
+      "errorMessage": "AI Error 603: headings must be a dictionary"
+    },
+    {
+      "id": "live.generate_domains",
+      "tier": "T4",
+      "feature": "generate_domains (core)",
+      "status": "PASS",
+      "durationMs": 2791,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793533555229-generate_domains",
+      "responseKey": "e2e-live-1793533555229-generate_domains:generate_domains",
+      "detail": "3 domains"
+    },
+    {
+      "id": "live.generate_titles",
+      "tier": "T4",
+      "feature": "generate_titles (core)",
+      "status": "FAIL",
+      "durationMs": 258,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793533555229-generate_titles",
+      "responseKey": "e2e-live-1793533555229-generate_titles:generate_titles",
+      "errorMessage": "AI Error 603: Missing field ''level''"
+    },
+    {
+      "id": "live.modify_outline",
+      "tier": "T4",
+      "feature": "modify_outline (core)",
+      "status": "FAIL",
+      "durationMs": 1513,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793533555229-modify_outline",
+      "responseKey": "e2e-live-1793533555229-modify_outline:modify_outline",
+      "errorMessage": "AI Error 603: Missing field ''domain''"
+    },
+    {
+      "id": "live.get_journals",
+      "tier": "T4",
+      "feature": "get_journals (core)",
+      "status": "PASS",
+      "durationMs": 3884,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 1080000,
+      "documentId": "e2e-live-1793533555229-get_journals",
+      "responseKey": "e2e-live-1793533555229-get_journals:get_journals",
+      "detail": "response OK"
+    },
+    {
+      "id": "live.write_content",
+      "tier": "T4",
+      "feature": "write_content (core)",
+      "status": "PASS",
+      "durationMs": 2341,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 1800000,
+      "documentId": "e2e-live-1793533555229-write_content",
+      "responseKey": "e2e-live-1793533555229-write_content:write_content",
+      "detail": "write_content finished"
+    },
+    {
+      "id": "live.comment_data",
+      "tier": "T4",
+      "feature": "comment_data (core)",
+      "status": "FAIL",
+      "durationMs": 28,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 360000,
+      "documentId": "e2e-live-1793533555229-comment_data",
+      "responseKey": "e2e-live-1793533555229-comment_data:comment_data",
+      "errorMessage": "AI Error 603: variables_data cannot be empty"
+    },
+    {
+      "id": "live.propose_method",
+      "tier": "T4",
+      "feature": "propose_method (core)",
+      "status": "FAIL",
+      "durationMs": 1519,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 360000,
+      "documentId": "e2e-live-1793533555229-propose_method",
+      "responseKey": "e2e-live-1793533555229-propose_method:propose_method",
+      "errorMessage": "AI Error 603: research_type cannot be empty"
+    },
+    {
+      "id": "live.get_suggestions",
+      "tier": "T4",
+      "feature": "get_suggestions (core)",
+      "status": "FAIL",
+      "durationMs": 22,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793533555229-get_suggestions",
+      "responseKey": "e2e-live-1793533555229-get_suggestions:get_suggestions",
+      "errorMessage": "AI Error 603: Missing field ''section''"
+    }
+  ],
+  "totals": {
+    "total": 9,
+    "pass": 3,
+    "fail": 6,
+    "skip": 0
+  }
+}

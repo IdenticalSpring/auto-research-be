@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-11-01T12:10:28.594Z",
+  "durationMs": 104229,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793534924365
+  },
+  "cases": [
+    {
+      "id": "live.generate_titles",
+      "tier": "T4",
+      "feature": "generate_titles (core)",
+      "status": "PASS",
+      "durationMs": 99003,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793534924365-generate_titles",
+      "responseKey": "e2e-live-1793534924365-generate_titles:generate_titles",
+      "detail": "9 titles"
+    },
+    {
+      "id": "live.modify_outline",
+      "tier": "T4",
+      "feature": "modify_outline (core)",
+      "status": "PASS",
+      "durationMs": 654,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793534924365-modify_outline",
+      "responseKey": "e2e-live-1793534924365-modify_outline:modify_outline",
+      "detail": "outline OK"
+    },
+    {
+      "id": "live.get_suggestions",
+      "tier": "T4",
+      "feature": "get_suggestions (core)",
+      "status": "PASS",
+      "durationMs": 4520,
+      "modelId": "deepseek-flash",
+      "timeoutMs": 240000,
+      "documentId": "e2e-live-1793534924365-get_suggestions",
+      "responseKey": "e2e-live-1793534924365-get_suggestions:get_suggestions",
+      "detail": "OK"
+    }
+  ],
+  "totals": {
+    "total": 3,
+    "pass": 3,
+    "fail": 0,
+    "skip": 0
+  }
+}

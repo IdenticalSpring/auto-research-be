@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-11-01T14:04:39.786Z",
+  "durationMs": 367739,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793541512048
+  },
+  "cases": [
+    {
+      "id": "live.propose_method",
+      "tier": "T4",
+      "feature": "propose_method (core)",
+      "status": "FAIL",
+      "durationMs": 366995,
+      "owner": "ai-server",
+      "modelId": "deepseek-flash",
+      "timeoutMs": 360000,
+      "documentId": "e2e-live-1793541512048-propose_method",
+      "responseKey": "e2e-live-1793541512048-propose_method:propose_method",
+      "errorMessage": "Timeout sau 6 phút không nhận thêm response (event=propose_method, doc=0000e2ee1793541512048eed, session=sess-e2e-live-1793541512048-propose_method, model=deepseek-flash, chunks=1)"
+    }
+  ],
+  "totals": {
+    "total": 1,
+    "pass": 0,
+    "fail": 1,
+    "skip": 0
+  }
+}

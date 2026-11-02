@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-11-01T17:25:27.063Z",
+  "durationMs": 1,
+  "meta": {
+    "modelId": "deepseek-flash",
+    "modelRequested": "deepseek-flash",
+    "allowedModels": [
+      "gemini-3.5-flash-lite",
+      "deepseek-flash",
+      "localhost"
+    ],
+    "tiers": [
+      "live"
+    ],
+    "startedAt": 1793553927062
+  },
+  "cases": [
+    {
+      "id": "live.search_papers",
+      "tier": "T4",
+      "feature": "search_papers (smoke)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "dry-run topic=document_setup_request key=e2e-live-1793553927062-search_papers:search_papers timeout=360s model=deepseek-flash"
+    },
+    {
+      "id": "live.chuyen_de_2",
+      "tier": "T4",
+      "feature": "chuyen_de_2 (smoke)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "dry-run topic=write_section_request key=e2e-live-1793553927062-chuyen_de_2:chuyen_de_2 timeout=2160s model=deepseek-flash"
+    },
+    {
+      "id": "live.ai_in_doc",
+      "tier": "T4",
+      "feature": "ai_in_doc (smoke)",
+      "status": "SKIP",
+      "durationMs": 0,
+      "detail": "dry-run topic=enhancement_request key=e2e-live-1793553927062-ai_in_doc:ai_in_doc timeout=288s model=deepseek-flash"
+    }
+  ],
+  "totals": {
+    "total": 3,
+    "pass": 0,
+    "fail": 0,
+    "skip": 3
+  }
+}
