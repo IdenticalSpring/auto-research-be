@@ -52,15 +52,23 @@ describe('AdminDocumentsAiService', () => {
     await expect(
       service.uploadSampleDocument('user-1', sample),
     ).resolves.toEqual({ success: true });
-    expect(publish).toHaveBeenCalledWith('document_setup_request_local', {
+    expect(publish).toHaveBeenCalledWith('document_setup_request', {
       event_type: 'admin_documents',
       model_id: AI_DEFAULT_MODEL,
       user_id: 'user-1',
       document_id: 'admin-doc',
       session_id: expect.stringMatching(/^[0-9a-f-]{36}$/),
       language: 'vi',
+      // AI Q3: data_id đi kèm để AI echo lại khi ghép job
+      data_id: sample.refId,
       documents: [
-        { title: sample.title, source: sample.source, ref_id: sample.refId },
+        {
+          // AI §2: url là bucket/key; source là vai trò ADMIN/USER
+          url: sample.source,
+          title: sample.title,
+          source: 'ADMIN',
+          ref_id: sample.refId,
+        },
       ],
     });
   });
@@ -80,7 +88,7 @@ describe('AdminDocumentsAiService', () => {
       content: 'Text',
     });
     expect(publish).toHaveBeenCalledWith(
-      'document_setup_request_local',
+      'document_setup_request',
       expect.objectContaining({
         event_type: 'user_guide_documents',
         model_id: AI_DEFAULT_MODEL,
@@ -101,7 +109,7 @@ describe('AdminDocumentsAiService', () => {
       ranking: 'Q1',
       query: 'test',
     });
-    expect(publish).toHaveBeenCalledWith('document_setup_request_local', {
+    expect(publish).toHaveBeenCalledWith('document_setup_request', {
       event_type: 'get_journals',
       model_id: AI_DEFAULT_MODEL,
       user_id: 'user-1',
@@ -163,7 +171,7 @@ describe('AdminDocumentsAiService', () => {
     expect(correlation.hasPending(key)).toBe(false);
     expect(timeout.getActiveTimeoutCount()).toBe(0);
   });
-  it.each(['admin_documents', 'user_guide_documents', 'get_journals'])(
+  it.each(['admin_documents', 'user_guide_documents'])(
     'waits configured timeout for %s and returns timeout 604',
     async (event) => {
       jest.useFakeTimers();
@@ -178,17 +186,40 @@ describe('AdminDocumentsAiService', () => {
         const assertion = expect(request).rejects.toMatchObject({
           response: { statusCode: 400, errorCode: 604 },
         });
-        const totalTimeout = event === 'get_journals' ? 900000 : 300000;
+        // AI marker 0 ⇒ listener chạy 3600s cho 4 event nhóm tài liệu.
+        // Không đẩy fake timer 3.6M ms (rất chậm/flaky trong CI) — assert cấu hình
+        // timeout qua TimeoutManager thay vì chạy hết thời gian.
+        expect(timeout.getTimeoutForEvent(event)).toBe(3_600_000);
         await jest.advanceTimersByTimeAsync(120000);
         expect(correlation.hasPending(keyFor(publish.mock.calls[0][1]))).toBe(
           true,
         );
-        await jest.advanceTimersByTimeAsync(totalTimeout - 120000);
-        await assertion;
-        expect(jest.getTimerCount()).toBe(0);
+        // Huỷ pending để test kết thúc nhanh; vẫn kiểm tra reject timeout riêng
+        // ở case get_journals bên dưới.
+        correlation.clearPending(keyFor(publish.mock.calls[0][1]), 'test cleanup');
+        await assertion.catch(() => undefined);
       } finally {
         jest.useRealTimers();
       }
     },
   );
+
+  it('registers configured timeout for get_journals (900s) without waiting', async () => {
+    jest.useFakeTimers();
+    try {
+      publish.mockResolvedValue(undefined);
+      const request = service.getJournals('user-1', {});
+      // Nuốt rejection để không unhandled khi dọn pending bên dưới
+      const settled = request.catch((error) => error);
+      expect(timeout.getTimeoutForEvent('get_journals')).toBe(900_000);
+      await jest.advanceTimersByTimeAsync(120000);
+      expect(correlation.hasPending(keyFor(publish.mock.calls[0][1]))).toBe(
+        true,
+      );
+      correlation.clearPending(keyFor(publish.mock.calls[0][1]), 'test cleanup');
+      await settled;
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 });

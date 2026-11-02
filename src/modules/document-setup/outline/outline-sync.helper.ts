@@ -31,11 +31,41 @@ export class OutlineSyncHelper {
     outlineCode?: string[],
   ) {
     const defaultHeadings = [
-      { title: 'Chương 1: Mở đầu', percent: 15 },
-      { title: 'Chương 2: Cơ sở lý thuyết', percent: 25 },
-      { title: 'Chương 3: Phương pháp nghiên cứu', percent: 25 },
-      { title: 'Chương 4: Kết quả và thảo luận', percent: 25 },
-      { title: 'Chương 5: Kết luận', percent: 10 },
+      {
+        heading: 'Chương 1: Mở đầu',
+        title: 'Chương 1: Mở đầu',
+        overview: 'Tổng quan nội dung chương.',
+        word_count: '1000-1500',
+        percent: 15,
+      },
+      {
+        heading: 'Chương 2: Cơ sở lý thuyết',
+        title: 'Chương 2: Cơ sở lý thuyết',
+        overview: 'Tổng quan nội dung chương.',
+        word_count: '1000-1500',
+        percent: 25,
+      },
+      {
+        heading: 'Chương 3: Phương pháp nghiên cứu',
+        title: 'Chương 3: Phương pháp nghiên cứu',
+        overview: 'Tổng quan nội dung chương.',
+        word_count: '1000-1500',
+        percent: 25,
+      },
+      {
+        heading: 'Chương 4: Kết quả và thảo luận',
+        title: 'Chương 4: Kết quả và thảo luận',
+        overview: 'Tổng quan nội dung chương.',
+        word_count: '1000-1500',
+        percent: 25,
+      },
+      {
+        heading: 'Chương 5: Kết luận',
+        title: 'Chương 5: Kết luận',
+        overview: 'Tổng quan nội dung chương.',
+        word_count: '1000-1500',
+        percent: 10,
+      },
     ];
     const rawHeadings = headings && headings.length > 0 ? headings : defaultHeadings;
     let finalPercents = percents;
@@ -53,16 +83,35 @@ export class OutlineSyncHelper {
     const finalHeadings = rawHeadings.map((h, idx) => {
       const p = finalPercents[idx];
       if (typeof h === 'string') {
-        return { title: h, percent: p };
-      }
-      if (h && typeof h === 'object') {
         return {
-          title: h.title || h.name || `Chương ${idx + 1}`,
-          percent: typeof h.percent === 'number' ? h.percent : p,
-          ...h,
+          heading: h,
+          title: h,
+          overview: 'Tổng quan nội dung chương.',
+          word_count: '1000-1500',
+          percent: p,
         };
       }
-      return { title: `Chương ${idx + 1}`, percent: p };
+      if (h && typeof h === 'object') {
+        // AI server đọc key `heading` (KeyError 617 nếu thiếu); `title` giữ lại
+        // để tương thích DB/FE và các bản AI cũ. AI cũng đọc `overview` +
+        // `word_count` của từng heading (quyết định 2026-11-01).
+        const title = h.title || h.heading || h.name || `Chương ${idx + 1}`;
+        return {
+          ...h,
+          heading: h.heading || title,
+          title,
+          overview: h.overview || h.description || 'Tổng quan nội dung chương.',
+          word_count: h.word_count || '1000-1500',
+          percent: typeof h.percent === 'number' ? h.percent : p,
+        };
+      }
+      return {
+        heading: `Chương ${idx + 1}`,
+        title: `Chương ${idx + 1}`,
+        overview: 'Tổng quan nội dung chương.',
+        word_count: '1000-1500',
+        percent: p,
+      };
     });
 
     const finalCode =

@@ -40,6 +40,8 @@ export class UserUploadedDocumentAiService {
       kafkaData: {
         file_id: file.id,
         file_url: fileUrl,
+        // §1.4: data_id cho nhóm tài liệu (AI echo lại nếu request có).
+        data_id: file.id,
         documents: [{ url: fileUrl, name: file.fileName }],
       },
       onError: async () => {
@@ -64,6 +66,7 @@ export class UserUploadedDocumentAiService {
       kafkaData: {
         file_id: file.id,
         document_id: file.documentId,
+        data_id: file.id,
         processed_docs: processedDocs,
       },
       onError: async () => {
@@ -108,6 +111,8 @@ export class UserUploadedDocumentAiService {
       kafkaData: {
         file_id: file.id,
         file_url: fileUrl,
+        // §1.4: data_id cho nhóm tài liệu (AI echo lại nếu request có).
+        data_id: file.id,
         documents: [{ url: fileUrl, name: file.fileName }],
       },
       onError: async () => {
@@ -134,6 +139,7 @@ export class UserUploadedDocumentAiService {
       kafkaData: {
         file_id: file.id,
         document_id: file.documentId,
+        data_id: file.id,
         processed_docs: dto.processedDocs || [],
       },
       onError: async () => {
@@ -179,6 +185,8 @@ export class UserUploadedDocumentAiService {
         document_id: dto.documentId,
         query: dto.query,
         top_k: dto.topK || 5,
+        // AI Q3 (optional nhưng nên gửi): echo lại để ghép job.
+        data_id: dto.dataId || dto.documentId,
         documents: docList,
       },
     });

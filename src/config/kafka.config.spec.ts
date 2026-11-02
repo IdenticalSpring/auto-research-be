@@ -30,13 +30,10 @@ describe('resolveKafkaTopicSuffix', () => {
     expect(resolveKafkaTopicSuffix('', true)).toBe('');
   });
 
-  it('trả về "_local" khi useLocalTopics là true', () => {
-    expect(resolveKafkaTopicSuffix(undefined, true)).toBe('_local');
-    expect(resolveKafkaTopicSuffix(undefined, 'true')).toBe('_local');
-    expect(resolveKafkaTopicSuffix(undefined, 'TRUE')).toBe('_local');
-  });
-
-  it('mặc định trả về rỗng khi không bật local topics', () => {
+  it('mặc định luôn trả về rỗng, không sinh suffix _local', () => {
+    expect(resolveKafkaTopicSuffix(undefined, true)).toBe('');
+    expect(resolveKafkaTopicSuffix(undefined, 'true')).toBe('');
+    expect(resolveKafkaTopicSuffix(undefined, 'TRUE')).toBe('');
     expect(resolveKafkaTopicSuffix(undefined, false)).toBe('');
     expect(resolveKafkaTopicSuffix(undefined, 'false')).toBe('');
     expect(resolveKafkaTopicSuffix(undefined, undefined)).toBe('');

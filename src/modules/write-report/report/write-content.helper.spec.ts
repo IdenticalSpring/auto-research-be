@@ -65,3 +65,139 @@ describe('WriteContentHelper', () => {
     });
   });
 });
+
+describe('WriteContentHelper.extractMarkdown — nhánh biên', () => {
+  it('should bỏ qua section không có content và trả null khi map rỗng', () => {
+    const sectionsMap = new Map<string, string>();
+
+    const res = WriteContentHelper.extractMarkdown(sectionsMap, {
+      section: { name: 'Chương 1', content: '   ' },
+    });
+
+    expect(res).toBeNull();
+  });
+
+  it('should không thêm tiêu đề khi content đã bắt đầu bằng "#"', () => {
+    const sectionsMap = new Map<string, string>();
+
+    const res = WriteContentHelper.extractMarkdown(sectionsMap, {
+      section: { section_code: '1.1', content: '# Tiêu đề sẵn' },
+    });
+
+    expect(res).toBe('# Tiêu đề sẵn');
+  });
+
+  it('should dùng "Phần" khi section thiếu name và section_code', () => {
+    const sectionsMap = new Map<string, string>();
+
+    const res = WriteContentHelper.extractMarkdown(sectionsMap, {
+      section: { content: 'Nội dung' },
+    });
+
+    expect(res).toBe('## Phần\n\nNội dung');
+  });
+});
+
+describe('WriteContentHelper.handleChunk', () => {
+  function buildPrisma() {
+    return {
+      report: { upsert: jest.fn(async () => ({})) as any },
+      job: { update: jest.fn(async () => ({})) as any },
+    };
+  }
+  type MockPrisma = ReturnType<typeof buildPrisma>;
+  const asPrisma = (p: MockPrisma) => p as unknown as PrismaService;
+  let prisma: MockPrisma;
+
+  beforeEach(() => {
+    prisma = buildPrisma();
+  });
+
+  it('should upsert report khi có markdown', async () => {
+    const res = await WriteContentHelper.handleChunk(
+      asPrisma(prisma),
+      'job-1',
+      { content: 'Nội dung', thread_id: 't-1' },
+      new Map(),
+      'doc-1',
+    );
+
+    expect(prisma.report.upsert).toHaveBeenCalledWith({
+      where: { documentId: 'doc-1' },
+      update: { contentMarkdown: 'Nội dung' },
+      create: { documentId: 'doc-1', contentMarkdown: 'Nội dung' },
+    });
+    expect(res).toEqual({ inProgress: true });
+  });
+
+  it('should suspend ở chapter_break / __interrupt__', async () => {
+    const res = await WriteContentHelper.handleChunk(
+      asPrisma(prisma),
+      'job-1',
+      { chapter_break: true, thread_id: 't-1' },
+      new Map(),
+      'doc-1',
+    );
+
+    expect(res).toEqual({ isSuspended: true, reason: 'chapter_break' });
+    expect(prisma.job.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: JobStatus.suspended,
+          resumeStep: 'chapter_break',
+          threadId: 't-1',
+        }),
+      }),
+    );
+
+    const interrupt = await WriteContentHelper.handleChunk(
+      asPrisma(prisma),
+      'job-2',
+      { __interrupt__: true },
+      new Map(),
+      'doc-1',
+    );
+    expect(interrupt).toEqual({ isSuspended: true, reason: 'chapter_break' });
+  });
+
+  it('should suspend ở need_data_analyze', async () => {
+    const res = await WriteContentHelper.handleChunk(
+      asPrisma(prisma),
+      'job-1',
+      { need_data_analyze: true },
+      new Map(),
+      'doc-1',
+    );
+
+    expect(res).toEqual({ isSuspended: true, reason: 'need_data_analyze' });
+  });
+
+  it('should suspend ở need_propose_method', async () => {
+    const res = await WriteContentHelper.handleChunk(
+      asPrisma(prisma),
+      'job-1',
+      { need_propose_method: true },
+      new Map(),
+      'doc-1',
+    );
+
+    expect(res).toEqual({ isSuspended: true, reason: 'need_propose_method' });
+  });
+
+  it('should finish khi has_finished=true', async () => {
+    const res = await WriteContentHelper.handleChunk(
+      asPrisma(prisma),
+      'job-1',
+      { has_finished: true },
+      new Map(),
+      'doc-1',
+    );
+
+    expect(res).toEqual({ isFinished: true });
+    expect(prisma.job.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ status: JobStatus.finished }),
+      }),
+    );
+  });
+});

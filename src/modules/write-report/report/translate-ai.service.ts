@@ -10,7 +10,7 @@ import { randomUUID } from 'node:crypto';
 import { PrismaService } from '../../../database/prisma.service';
 import { KafkaProducerService } from '../../../messaging/kafka-producer.service';
 import { RequestCorrelationService } from '../../../messaging/request-correlation.service';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 import { TranslateReportDto } from './dto/translate-report.dto';
 import { WriteContentMongoHelper } from './write-content-mongo.helper';
 
@@ -51,7 +51,7 @@ export class TranslateAiService {
 
     const payload: Record<string, unknown> = {
       event_type: EVENT_TYPE,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: mongoDocId,
       session_id: sessionId,
@@ -84,7 +84,7 @@ export class TranslateAiService {
 
     const topic =
       this.configService.get<string>('kafka.topics.write_report.request') ||
-      'write_section_request_local';
+      'write_section_request';
 
     try {
       await this.kafkaProducer.publish(topic, payload);

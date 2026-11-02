@@ -106,7 +106,7 @@ export class ReferenceService {
 
     const topic =
       this.configService.get<string>('kafka.topics.document_setup.request') ||
-      'document_setup_request_local';
+      'document_setup_request';
 
     try {
       await this.kafkaProducer.publish(topic, payload);
@@ -185,7 +185,7 @@ export class ReferenceService {
     const sessionId = `sess-journal-${randomUUID()}`;
     const topic =
       this.configService.get<string>('kafka.topics.document_setup.request') ||
-      'document_setup_request_local';
+      'document_setup_request';
     const correlationKey = this.correlationService.buildCorrelationKey({
       userId: 'system',
       documentId: 'system',

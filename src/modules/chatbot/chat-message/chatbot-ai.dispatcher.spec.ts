@@ -38,7 +38,7 @@ describe('ChatbotAiDispatcher', () => {
     };
 
     mockConfigService = {
-      get: jest.fn<any>().mockReturnValue('chatbot_request_local'),
+      get: jest.fn<any>().mockReturnValue('chatbot_request'),
     };
 
     const module: TestingModule = await Test.createTestingModule({

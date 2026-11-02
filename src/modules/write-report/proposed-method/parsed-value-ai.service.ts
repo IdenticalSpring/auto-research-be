@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JobStatus, ModuleType, Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import { getAiErrorMessage } from '../../../common/constants/ai-error-codes';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 import { PrismaService } from '../../../database/prisma.service';
 import { KafkaProducerService } from '../../../messaging/kafka-producer.service';
 import { RequestCorrelationService } from '../../../messaging/request-correlation.service';
@@ -73,11 +73,14 @@ export class ParsedValueAiService {
     const mongoDocId = WriteContentMongoHelper.toMongoDocId(documentId);
     const kafkaPayload: Record<string, unknown> = {
       event_type: EVENT_TYPE,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: mongoDocId,
       session_id: sessionId,
       language: 'Vietnamese',
+      // AI echo `data_id` nếu request có (quyết định 2026-11-01 §1.4):
+      // parsed_value thuộc nhóm tài liệu ⇒ gửi data_id để AI/BE correlate.
+      data_id: mongoDocId,
       ...payload,
     };
 
@@ -94,7 +97,7 @@ export class ParsedValueAiService {
 
     const topic =
       this.configService.get<string>('kafka.topics.write_report.request') ||
-      'write_section_request_local';
+      'write_section_request';
 
     try {
       await this.kafkaProducer.publish(topic, kafkaPayload);

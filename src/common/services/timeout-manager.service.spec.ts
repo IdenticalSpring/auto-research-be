@@ -40,41 +40,65 @@ describe('TimeoutManagerService', () => {
   });
 
   describe('getTimeoutForEvent', () => {
-    it('should return 1500s (1500000ms) for heavy generation events', () => {
-      expect(service.getTimeoutForEvent('write_content')).toBe(1500_000);
-      expect(service.getTimeoutForEvent('chuyen_de_1')).toBe(1500_000);
-      expect(service.getTimeoutForEvent('chuyen_de_2')).toBe(1500_000);
-      expect(service.getTimeoutForEvent('chuyen_de_3')).toBe(1500_000);
-      expect(service.getTimeoutForEvent('writer')).toBe(1500_000);
+    it('should return 1800s for heavy generation events (AI TIME_OUT_DICT = 1800)', () => {
+      expect(service.getTimeoutForEvent('write_content')).toBe(1_800_000);
+      expect(service.getTimeoutForEvent('chuyen_de_1')).toBe(1_800_000);
+      expect(service.getTimeoutForEvent('chuyen_de_2')).toBe(1_800_000);
+      expect(service.getTimeoutForEvent('chuyen_de_3')).toBe(1_800_000);
+      expect(service.getTimeoutForEvent('writer')).toBe(1_800_000);
     });
 
     it('should return 900s (900000ms) for journal scraping', () => {
       expect(service.getTimeoutForEvent('get_journals')).toBe(900_000);
     });
 
-    it('should return 300s (300000ms) for analysis & slide events', () => {
-      expect(service.getTimeoutForEvent('analyzer')).toBe(300_000);
-      expect(service.getTimeoutForEvent('gen_slides')).toBe(300_000);
-      expect(service.getTimeoutForEvent('comment_data')).toBe(300_000);
-      expect(service.getTimeoutForEvent('propose_method')).toBe(300_000);
-      expect(service.getTimeoutForEvent('admin_documents')).toBe(300_000);
+    it('should return 1500s for generate_outline (AI = 1500)', () => {
+      expect(service.getTimeoutForEvent('generate_outline')).toBe(1_500_000);
     });
 
-    it('should return 180s (180000ms) for proposal, outline and papers events', () => {
-      expect(service.getTimeoutForEvent('generate_titles')).toBe(180_000);
-      expect(service.getTimeoutForEvent('generate_title_description')).toBe(180_000);
-      expect(service.getTimeoutForEvent('mix_titles')).toBe(180_000);
-      expect(service.getTimeoutForEvent('generate_outline')).toBe(180_000);
-      expect(service.getTimeoutForEvent('search_papers')).toBe(180_000);
-      expect(service.getTimeoutForEvent('embed_user_documents')).toBe(180_000);
+    it('should return 420s for analysis & slide events (AI = 420)', () => {
+      expect(service.getTimeoutForEvent('analyzer')).toBe(420_000);
+      expect(service.getTimeoutForEvent('analyzer_tool')).toBe(420_000);
+      expect(service.getTimeoutForEvent('gen_slides')).toBe(420_000);
+      expect(service.getTimeoutForEvent('comment_data')).toBe(420_000);
+      expect(service.getTimeoutForEvent('propose_method')).toBe(420_000);
+      expect(service.getTimeoutForEvent('parsed_value')).toBe(420_000);
+      expect(service.getTimeoutForEvent('edit_report')).toBe(420_000);
     });
 
-    it('should return 120s (120000ms) for chatbot & text enhancement events', () => {
-      expect(service.getTimeoutForEvent('outer_chatbot')).toBe(120_000);
-      expect(service.getTimeoutForEvent('inner_chatbot')).toBe(120_000);
-      expect(service.getTimeoutForEvent('writer_chatbot')).toBe(120_000);
-      expect(service.getTimeoutForEvent('enhance')).toBe(120_000);
+    it('should return 3600s for document-file events (AI marker 0 = 3600s)', () => {
+      expect(service.getTimeoutForEvent('admin_documents')).toBe(3_600_000);
+      expect(service.getTimeoutForEvent('user_guide_documents')).toBe(3_600_000);
+      expect(service.getTimeoutForEvent('user_documents')).toBe(3_600_000);
+      expect(service.getTimeoutForEvent('embed_user_documents')).toBe(3_600_000);
+    });
+
+    it('should return 300s for logic check & paper search events', () => {
+      expect(service.getTimeoutForEvent('check_logic_data')).toBe(300_000);
+      expect(service.getTimeoutForEvent('search_papers')).toBe(300_000);
+    });
+
+    it('should return 420s for proposal generation events (AI = 420)', () => {
+      expect(service.getTimeoutForEvent('generate_titles')).toBe(420_000);
+      expect(service.getTimeoutForEvent('generate_title_description')).toBe(
+        420_000,
+      );
+      expect(service.getTimeoutForEvent('mix_titles')).toBe(420_000);
+    });
+
+    it('should return 240s for chatbot & enhancement events (AI = 240)', () => {
+      expect(service.getTimeoutForEvent('outer_chatbot')).toBe(240_000);
+      expect(service.getTimeoutForEvent('inner_chatbot')).toBe(240_000);
+      expect(service.getTimeoutForEvent('writer_chatbot')).toBe(240_000);
+      expect(service.getTimeoutForEvent('ai_in_doc')).toBe(240_000);
+      expect(service.getTimeoutForEvent('enhance')).toBe(240_000);
+      expect(service.getTimeoutForEvent('enhance_all')).toBe(240_000);
+    });
+
+    it('should return 120s for ideation events (AI = 120)', () => {
       expect(service.getTimeoutForEvent('generate_domains')).toBe(120_000);
+      expect(service.getTimeoutForEvent('generate_subdomains')).toBe(120_000);
+      expect(service.getTimeoutForEvent('generate_keywords')).toBe(120_000);
       expect(service.getTimeoutForEvent('delete_report')).toBe(120_000);
     });
 

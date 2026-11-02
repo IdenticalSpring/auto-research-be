@@ -75,7 +75,7 @@ describe('WriteContentAiService', () => {
         { provide: StreamingManagerService, useValue: mockStreamingManager },
         {
           provide: ConfigService,
-          useValue: { get: jest.fn<any>().mockReturnValue('write_section_request_local') },
+          useValue: { get: jest.fn<any>().mockReturnValue('write_section_request') },
         },
       ],
     }).compile();
@@ -105,7 +105,7 @@ describe('WriteContentAiService', () => {
       expect(res.status).toBe('started');
       expect(res.jobId).toBe('job-wc-1');
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'write_section_request_local',
+        'write_section_request',
         expect.objectContaining({ event_type: 'write_content' }),
       );
 
@@ -196,7 +196,7 @@ describe('WriteContentAiService', () => {
       });
       expect(res.threadId).toBe('thread-123');
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'write_section_request_local',
+        'write_section_request',
         expect.objectContaining({
           thread_id: 'thread-123',
           resume: true,
@@ -232,7 +232,7 @@ describe('WriteContentAiService', () => {
 
       expect(res.status).toBe('started');
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'write_section_request_local',
+        'write_section_request',
         expect.objectContaining({
           event_type: 'chuyen_de_2',
           practical_data: practicalData,
@@ -264,7 +264,7 @@ describe('WriteContentAiService', () => {
 
       expect(res.status).toBe('started');
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'write_section_request_local',
+        'write_section_request',
         expect.objectContaining({
           event_type: 'chuyen_de_3',
           analyze_log: 'OLS regression model completed',
@@ -307,7 +307,7 @@ describe('WriteContentAiService', () => {
         }),
       );
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'write_section_request_local',
+        'write_section_request',
         expect.objectContaining({
           resume: true,
           analyze_log: '{"p_value":0.03}',
@@ -378,7 +378,7 @@ describe('WriteContentAiService', () => {
         }),
       );
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'write_section_request_local',
+        'write_section_request',
         expect.objectContaining({
           resumeCharacter: true,
           thread_id: 'thread-break-ch',

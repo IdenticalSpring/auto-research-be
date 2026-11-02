@@ -55,6 +55,10 @@ export class WriteContentRequestDto {
 
   @IsOptional()
   @IsString()
+  heading?: string;
+
+  @IsOptional()
+  @IsString()
   threadId?: string;
 
   @IsOptional()

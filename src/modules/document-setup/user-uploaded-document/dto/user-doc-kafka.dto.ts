@@ -55,6 +55,11 @@ export class SearchUploadedDocsDto {
   @IsNotEmpty()
   documentId!: string;
 
+  /** AI Q3: data_id optional — AI echo lại để BE ghép job. */
+  @IsOptional()
+  @IsString()
+  dataId?: string;
+
   @IsString()
   @IsNotEmpty()
   query!: string;

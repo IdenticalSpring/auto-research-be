@@ -22,6 +22,7 @@
  * · KHÔNG chạy ở production: case `good` ghi dữ liệu thật vào Qdrant `admin_user_guide`.
  */
 import { Kafka, logLevel } from 'kafkajs';
+import { resolveScriptModelId } from './lib/ai-model';
 
 type CaseName = 'good' | 'missing-urls' | 'wrong-field' | 'empty-urls';
 type Verdict = 'PASS' | 'FAIL' | 'TIMEOUT' | 'DRY-RUN';
@@ -73,10 +74,7 @@ function buildPayload(
 ): Record<string, unknown> {
   const payload: Record<string, unknown> = {
     event_type: EVENT,
-    model_id:
-      process.env.AI_DEFAULT_MODEL ||
-      process.env.DEFAULT_AI_MODEL ||
-      'gemini-3.5-flash-lite',
+    model_id: resolveScriptModelId(),
     user_id: c.userId,
     document_id: 'admin',
     session_id: c.sessionId,
@@ -257,9 +255,7 @@ async function runCase(
 async function main(): Promise<void> {
   const brokerString =
     process.env.KAFKA || process.env.KAFKA_BROKERS || '167.254.70.125:9092';
-  const isLocal =
-    process.env.IS_LOCAL === 'true' || process.env.NODE_ENV !== 'production';
-  const suffix = process.env.TOPIC_SUFFIX ?? (isLocal ? '_local' : '');
+  const suffix = process.env.TOPIC_SUFFIX ?? '';
   const urlsArg = getArg('urls');
   const opts: RunOptions = {
     brokers: brokerString.split(',').map((b) => b.trim()),

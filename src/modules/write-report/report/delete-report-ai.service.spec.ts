@@ -33,7 +33,7 @@ describe('DeleteReportAiService', () => {
       ),
       clearPending: jest.fn(),
     };
-    config = { get: jest.fn(() => 'write_section_request_local') };
+    config = { get: jest.fn(() => 'write_section_request') };
 
     service = new DeleteReportAiService(
       prisma as never,

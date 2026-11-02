@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JobStatus, ModuleType, Prisma } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import { getAiErrorMessage } from '../../../common/constants/ai-error-codes';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 import { PrismaService } from '../../../database/prisma.service';
 import { KafkaProducerService } from '../../../messaging/kafka-producer.service';
 import { RequestCorrelationService } from '../../../messaging/request-correlation.service';
@@ -103,7 +103,7 @@ export class DataAnalysisAiService {
     // Identifier luôn gửi kèm để AI echo lại → BE correlate được (Q-06/D1/D5).
     const kafkaPayload: Record<string, unknown> = {
       event_type: eventType,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: dataset.documentId,
       session_id: resolvedSessionId,
@@ -124,7 +124,7 @@ export class DataAnalysisAiService {
 
     const topic =
       this.configService.get<string>('kafka.topics.write_report.request') ||
-      'write_section_request_local';
+      'write_section_request';
 
     try {
       await this.kafkaProducer.publish(topic, kafkaPayload);

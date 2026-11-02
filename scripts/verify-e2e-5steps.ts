@@ -1,7 +1,9 @@
 import { Kafka, logLevel } from 'kafkajs';
+import { resolveScriptModelId } from './lib/ai-model';
+import { MIN_E2E_TIMEOUT_MS } from './lib/e2e-timeouts';
 
 const BROKER = process.env.KAFKA || '100.120.3.64:9092';
-const MODEL_ID = process.env.AI_DEFAULT_MODEL || 'gemini-3.5-flash-lite';
+const MODEL_ID = resolveScriptModelId();
 const USER_ID = '00000000-0000-0000-0000-000000000001';
 const DOC_ID = '000000000000000000000002'; // 24-hex Mongo compatible
 
@@ -33,7 +35,7 @@ async function runE2E5Steps(): Promise<void> {
 
   // Subscribe to all relevant response topics
   await consumer.subscribe({ topic: 'document_setup_response', fromBeginning: false });
-  await consumer.subscribe({ topic: 'write_section_response_local', fromBeginning: false });
+  await consumer.subscribe({ topic: 'write_section_response', fromBeginning: false });
 
   const responseMap = new Map<string, (res: Record<string, unknown>) => void>();
 
@@ -92,7 +94,7 @@ async function runE2E5Steps(): Promise<void> {
       field: 'Thương mại điện tử',
       is_tool: false,
     };
-    const res1 = await sendAndAwait('document_setup_request', p1, 45000);
+    const res1 = await sendAndAwait('document_setup_request', p1, MIN_E2E_TIMEOUT_MS);
     const hasProposal = Boolean(res1.final_proposal || res1.title_description || res1.title);
     if (!hasProposal) throw new Error('Không nhận được đề tài / mô tả hợp lệ từ AI');
     results.push({ step: '1. Tạo đề tài (generate_title_description)', status: 'PASS', details: 'Nhận thành công proposal' });
@@ -117,7 +119,7 @@ async function runE2E5Steps(): Promise<void> {
       outline_type: 'full',
       is_tool: false,
     };
-    const res2 = await sendAndAwait('document_setup_request', p2, 45000);
+    const res2 = await sendAndAwait('document_setup_request', p2, MIN_E2E_TIMEOUT_MS);
     const hasOutline = Boolean(res2.outline || res2.outline_tree || res2.sections);
     if (!hasOutline) throw new Error('Không nhận được outline hợp lệ từ AI');
     results.push({ step: '2. Đề cương chi tiết (generate_outline)', status: 'PASS', details: 'Nhận thành công outline' });
@@ -151,7 +153,7 @@ async function runE2E5Steps(): Promise<void> {
         { name: 'chi_tieu', code: 'chi_tieu', scale: 'ratio', type: 'float', role: 'dependent', variable_type: 'observed' },
       ],
     };
-    const res3 = await sendAndAwait('write_section_request_local', p3, 60000);
+    const res3 = await sendAndAwait('write_section_request', p3, 60000);
     const hasOls = Boolean(res3.analysis_results || res3.report_html || res3.has_finished);
     if (!hasOls) throw new Error('Không nhận được kết quả OLS hợp lệ từ AI');
     results.push({ step: '3. Phân tích hồi quy OLS (analyzer)', status: 'PASS', details: 'Nhận thành công kết quả OLS' });
@@ -178,7 +180,7 @@ async function runE2E5Steps(): Promise<void> {
         ],
       },
     };
-    const res4 = await sendAndAwait('write_section_request_local', p4, 60000);
+    const res4 = await sendAndAwait('write_section_request', p4, 60000);
     const hasContent = Boolean(res4.section_name || res4.content || res4.has_finished !== undefined);
     if (!hasContent) throw new Error('Không nhận được nội dung viết bài từ AI');
     results.push({ step: '4. Soạn thảo chuyên đề (chuyen_de_1)', status: 'PASS', details: 'Nhận thành công nội dung bài viết' });
@@ -200,7 +202,7 @@ async function runE2E5Steps(): Promise<void> {
       user_preference: 5,
       manual_mode: false,
     };
-    const res5 = await sendAndAwait('write_section_request_local', p5, 60000);
+    const res5 = await sendAndAwait('write_section_request', p5, 60000);
     const hasSlides = Boolean(res5.pptx_url || res5.slides || res5.has_finished !== undefined);
     if (!hasSlides) throw new Error('Không nhận được slide PowerPoint từ AI');
     results.push({ step: '5. Tải slide PPTX (gen_slides)', status: 'PASS', details: 'Nhận thành công slide / link PPTX' });

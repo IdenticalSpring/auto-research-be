@@ -78,7 +78,7 @@ describe('GeneratedSlideAiService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn<any>().mockReturnValue('write_section_request_local'),
+            get: jest.fn<any>().mockReturnValue('write_section_request'),
           },
         },
       ],
@@ -119,7 +119,7 @@ describe('GeneratedSlideAiService', () => {
       expect(res.slideId).toBe(slideId);
 
       expect(mockKafkaProducer.publish).toHaveBeenCalledWith(
-        'write_section_request_local',
+        'write_section_request',
         expect.objectContaining({
           event_type: 'gen_slides',
           document_id: documentId,

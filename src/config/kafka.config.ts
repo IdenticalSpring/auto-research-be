@@ -21,16 +21,12 @@ export function resolveKafkaEnabled(raw: string | undefined): boolean {
 
 export function resolveKafkaTopicSuffix(
   explicitSuffix?: string,
-  useLocalTopics?: string | boolean,
+  _useLocalTopics?: string | boolean,
 ): string {
   if (explicitSuffix !== undefined) {
     return explicitSuffix;
   }
-  const isLocal =
-    typeof useLocalTopics === 'boolean'
-      ? useLocalTopics
-      : String(useLocalTopics).toLowerCase() === 'true';
-  return isLocal ? '_local' : '';
+  return '';
 }
 
 export default registerAs('kafka', () => {
@@ -39,7 +35,7 @@ export default registerAs('kafka', () => {
     process.env.KAFKA_TOPIC_SUFFIX,
     process.env.KAFKA_USE_LOCAL_TOPICS,
   );
-  const isLocal = suffix === '_local';
+  const isLocal = false;
 
   const rawBrokers =
     process.env.KAFKA || process.env.KAFKA_BROKERS || '167.254.70.125:9092';

@@ -9,7 +9,7 @@ import {
   getAiErrorMessage,
   getAiErrorName,
 } from '../../../common/constants/ai-error-codes';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 import { normalizeAiLanguage } from '../../../common/helpers/academic-level.helper';
 
 export interface ProposalAiDispatchOptions {
@@ -47,7 +47,7 @@ export class ProposalAiDispatcher {
 
     const payload = {
       event_type: opt.eventType,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: opt.userId,
       document_id: opt.documentId,
       session_id: sessionId,
@@ -67,7 +67,7 @@ export class ProposalAiDispatcher {
     >(corrKey, undefined, opt.eventType, job.id);
     const topic =
       this.configService.get<string>('kafka.topics.document_setup.request') ||
-      'document_setup_request_local';
+      'document_setup_request';
 
     try {
       await this.kafkaProducer.publish(topic, payload);

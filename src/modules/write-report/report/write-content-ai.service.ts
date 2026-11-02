@@ -22,7 +22,7 @@ import {
   WriteContentResumeHelper,
 } from './write-content-resume.helper';
 import { getAiErrorMessage } from '../../../common/constants/ai-error-codes';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 
 @Injectable()
 export class WriteContentAiService {
@@ -119,7 +119,7 @@ export class WriteContentAiService {
 
     const payload = {
       event_type: eventType,
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: mongoDocId,
       session_id: sessionId,
@@ -131,6 +131,7 @@ export class WriteContentAiService {
       papers_search: resolved.papersSearch,
       outline: resolved.outline,
       outline_code: resolved.outlineCode,
+      heading: dto.heading || (resolved.outlineCode && resolved.outlineCode[0]) || 'chapter_1',
       thread_id: threadId,
       db: 'redis',
       retry: 2,
@@ -150,7 +151,7 @@ export class WriteContentAiService {
 
     const topic =
       this.configService.get<string>('kafka.topics.write_report.request') ||
-      'write_section_request_local';
+      'write_section_request';
 
     try {
       await this.kafkaProducer.publish(topic, payload);

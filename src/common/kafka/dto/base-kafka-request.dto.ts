@@ -1,17 +1,13 @@
-import { IsIn, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
-import {
-  SUPPORTED_KAFKA_MODELS,
-  SupportedKafkaModel,
-} from '../kafka.constants';
+import { IsNotEmpty, IsString, Validate, ValidateIf } from 'class-validator';
+import { SupportedKafkaModel } from '../kafka.constants';
+import { IsAllowedAiModelConstraint } from '../validators/is-allowed-ai-model.validator';
 
 export class BaseKafkaRequestDto {
   @IsString({ message: 'event_type must be a string' })
   @IsNotEmpty({ message: 'event_type cannot be empty' })
   event_type!: string;
 
-  @IsIn(SUPPORTED_KAFKA_MODELS, {
-    message: `model_id must be one of: ${SUPPORTED_KAFKA_MODELS.join(', ')}`,
-  })
+  @Validate(IsAllowedAiModelConstraint)
   @IsNotEmpty({ message: 'model_id cannot be empty' })
   model_id!: SupportedKafkaModel | string;
 

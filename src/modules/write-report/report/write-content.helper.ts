@@ -134,6 +134,7 @@ export class WriteContentHelper {
         word_count: item.word_count || '1000-1500',
         sections,
         subheadings: sections,
+        subsections: sections,
       };
     });
 

@@ -3,40 +3,69 @@ import { JobStatus } from '@prisma/client';
 import { PrismaService } from '../../database/prisma.service';
 import { getAiErrorMessage } from '../constants/ai-error-codes';
 
+/**
+ * Timeout chờ phản hồi AI theo từng event (ms).
+ *
+ * RÀNG BUỘC: giá trị phải **≥ `TIME_OUT_DICT` của AI server** (giây), nếu không
+ * BE sẽ tự cắt job trước khi AI kịp trả kết quả ⇒ lỗi 604 giả. Đối chiếu AI
+ * `autoresearching/error_type.py::TIME_OUT_DICT` (quyết định 2026-11-01) và
+ * `scripts/lib/e2e-timeouts.ts::AI_TIMEOUT_DICT_SECONDS` (parity test sẽ fail
+ * nếu hai bảng lệch nhau).
+ */
 export const EVENT_TIMEOUT_CONFIG: Record<string, number> = {
-  // 1500s (25 minutes) - Long generation tasks
-  write_content: 1500_000,
-  chuyen_de_1: 1500_000,
-  chuyen_de_2: 1500_000,
-  chuyen_de_3: 1500_000,
-  writer: 1500_000,
+  // 1800s (30 phút) - Long generation tasks (AI: write_content/writer/chuyen_de_* = 1800)
+  write_content: 1_800_000,
+  chuyen_de_1: 1_800_000,
+  chuyen_de_2: 1_800_000,
+  chuyen_de_3: 1_800_000,
+  writer: 1_800_000,
 
-  // 900s (15 minutes) - Journal scraper
+  // 1500s (25 phút) - Outline generation (AI: generate_outline = 1500)
+  generate_outline: 1_500_000,
+
+  // 900s (15 phút) - Journal scraper
   get_journals: 900_000,
 
-  // 300s (5 minutes) - Heavy analysis & presentation
-  analyzer: 300_000,
-  admin_documents: 300_000,
-  user_guide_documents: 300_000,
-  analyzer_tool: 300_000,
-  gen_slides: 300_000,
-  comment_data: 300_000,
-  check_logic_data: 300_000,
-  propose_method: 300_000,
+  // 420s (7 phút) - Heavy analysis & presentation (AI = 420)
+  analyzer: 420_000,
+  analyzer_tool: 420_000,
+  gen_slides: 420_000,
+  comment_data: 420_000,
+  propose_method: 420_000,
+  parsed_value: 420_000,
+  edit_report: 420_000,
 
-  // 180s (3 minutes) - Proposal, Outline & Reference generation
-  generate_titles: 180_000,
-  generate_title_description: 180_000,
-  generate_title_description_no_info: 180_000,
-  mix_titles: 180_000,
-  generate_outline: 180_000,
+  // 3600s (60 phút) - Nhóm tài liệu: AI khai `TIME_OUT_DICT = 0` là MARKER,
+  // listener thực tế chạy 3600s (document_setup_listener.py:55-58) ⇒ BE phải chờ ≥ 3600s.
+  admin_documents: 3_600_000,
+  user_guide_documents: 3_600_000,
+  user_documents: 3_600_000,
+  embed_user_documents: 3_600_000,
+
+  // 300s (5 phút) - Kiểm tra logic dữ liệu
+  check_logic_data: 300_000,
+  search_papers: 300_000,
+
+  // 420s - Proposal & reference generation (AI = 420)
+  generate_titles: 420_000,
+  generate_title_description: 420_000,
+  generate_title_description_no_info: 420_000,
+  mix_titles: 420_000,
+
+  // 180s (3 phút) - Outline chỉnh sửa (AI không đặt timeout riêng)
   generate_outline_with_refs: 180_000,
   modify_outline: 180_000,
-  search_papers: 180_000,
-  user_documents: 180_000,
-  embed_user_documents: 180_000,
 
-  // 120s (2 minutes) - Chatbots & Text enhancement & Ideation (and default)
+  // 240s (4 phút) - Chatbot & enhancement (AI = 240)
+  outer_chatbot: 240_000,
+  inner_chatbot: 240_000,
+  writer_chatbot: 240_000,
+  ai_in_doc: 240_000,
+  get_suggestions: 240_000,
+  enhance: 240_000,
+  enhance_all: 240_000,
+
+  // 120s (2 phút) - Ideation (AI = 120)
   generate_domains: 120_000,
   generate_subdomains: 120_000,
   generate_keywords: 120_000,
@@ -44,13 +73,6 @@ export const EVENT_TIMEOUT_CONFIG: Record<string, number> = {
   search_user_documents: 120_000,
   delete_documents: 120_000,
   delete_report: 120_000,
-  outer_chatbot: 120_000,
-  inner_chatbot: 120_000,
-  writer_chatbot: 120_000,
-  ai_in_doc: 120_000,
-  get_suggestions: 120_000,
-  enhance: 120_000,
-  enhance_all: 120_000,
 };
 
 export const DEFAULT_TIMEOUT_MS = 120_000;

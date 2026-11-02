@@ -2,7 +2,7 @@ import { PrismaService } from '../../../database/prisma.service';
 import { SearchPapersDto } from './dto/search-papers.dto';
 import { PaperItemDto } from './dto/search-papers-response.dto';
 import { getAiErrorMessage } from '../../../common/constants/ai-error-codes';
-import { AI_DEFAULT_MODEL } from '../../../common/kafka/kafka.constants';
+import { getAiModelConfig } from '../../../common/kafka/kafka.constants';
 
 export class ReferenceSyncHelper {
   static async syncFoundPapers(
@@ -106,7 +106,7 @@ export class ReferenceSyncHelper {
 
     return {
       event_type: 'search_papers',
-      model_id: AI_DEFAULT_MODEL,
+      model_id: getAiModelConfig().defaultModel,
       user_id: userId,
       document_id: dto.documentId,
       session_id: sessionId,
@@ -120,9 +120,9 @@ export class ReferenceSyncHelper {
       is_oa: dto.isOa ?? false,
       is_tool: dto.isTool ?? false,
       downloaded_papers: dto.downloadedPapers ?? [],
-      cut_off_year_low: dto.cutOffYearLow,
-      cut_off_year_high: dto.cutOffYearHigh,
-      search_range: dto.searchRange || 'all',
+      cut_off_year_low: dto.cutOffYearLow ?? 2018,
+      cut_off_year_high: dto.cutOffYearHigh ?? new Date().getFullYear(),
+      search_range: dto.searchRange ?? '',
       use_web_search: dto.useWebSearch ?? false,
       job_id: jobId,
       ...(proposal ? { proposal } : {}),

@@ -72,7 +72,7 @@ describe('WriterChatbotService', () => {
         {
           provide: ConfigService,
           useValue: {
-            get: jest.fn<any>().mockReturnValue('chatbot_request_local'),
+            get: jest.fn<any>().mockReturnValue('chatbot_request'),
           },
         },
       ],

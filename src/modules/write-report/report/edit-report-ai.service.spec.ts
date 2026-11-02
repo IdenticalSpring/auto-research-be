@@ -35,7 +35,7 @@ describe('EditReportAiService', () => {
       registerPending: jest.fn(() => Promise.resolve(pendingResponse)),
       clearPending: jest.fn(),
     };
-    const configMock = { get: jest.fn(() => 'write_section_request_local') };
+    const configMock = { get: jest.fn(() => 'write_section_request') };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [

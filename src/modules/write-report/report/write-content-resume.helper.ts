@@ -96,7 +96,7 @@ export class WriteContentResumeHelper {
 
     const topic =
       ctx.configService.get<string>('kafka.topics.write_report.request') ||
-      'write_section_request_local';
+      'write_section_request';
 
     try {
       await ctx.kafkaProducer.publish(topic, payload);
@@ -179,7 +179,7 @@ export class WriteContentResumeHelper {
 
     const topic =
       ctx.configService.get<string>('kafka.topics.write_report.request') ||
-      'write_section_request_local';
+      'write_section_request';
 
     try {
       await ctx.kafkaProducer.publish(topic, payload);
